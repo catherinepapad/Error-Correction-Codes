@@ -4,5 +4,5 @@
 irregular LDPC κώδικα, υλοποίηση αποκωδικοποιητή και μελέτη της βελτίωσης που προσφέρει συγκριτικά με
 ένα regular LDPC κώδικα με ίδιο κωδικό ρυθμό και μέγεθος κωδικολέξης.
 
-*Σημείωση*: Τα r, l του regular LDPC πρέπει να είναι μικρότερα ή ίσα των rmax, lmax του irregular LDPC,
+*Σημείωση*: Τα r, l του regular LDPC πρέπει να είναι μικρότερα ή ίσα των r<sub>max</sub>, l<sub>max</sub> του irregular LDPC,
 δηλαδή r ≤ r<sub>max</sub> και l ≤ l<sub>max</sub>. 
