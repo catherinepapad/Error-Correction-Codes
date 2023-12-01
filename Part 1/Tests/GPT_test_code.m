@@ -1,31 +1,36 @@
 % Parameters
 M = 4; % Modulation order
 SNR_dB = 10; % Signal-to-noise ratio in dB
+initial_phase = pi/4; % Initial phase in radians
 
-% Generate PAM signal
-data = randi([0, M-1], 100, 1);
-symbols = pammod(data, M);
+% Generate Gray-coded PAM signal with specified initial phase
+gray_data = randi([0, M-1], 1000, 1);
+binary_data = de2bi(gray_data, log2(M), 'left-msb'); % Convert to binary
+symbols = pammod(gray_data, M, initial_phase, 'gray');
 
 % Add noise
 noisy_symbols = awgn(symbols, SNR_dB, 'measured');
 
 % Demodulate
-demodulated_data = pamdemod(noisy_symbols, M);
+demodulated_data = pamdemod(noisy_symbols, M, initial_phase, 'gray');
+
+% Convert demodulated data to binary
+demodulated_binary = de2bi(demodulated_data, log2(M), 'left-msb');
 
 % Evaluate performance
-bit_error_rate = biterr(data, demodulated_data) / numel(data);
+bit_error_rate = biterr(binary_data, demodulated_binary) / numel(binary_data);
 disp(['Bit Error Rate: ', num2str(bit_error_rate)]);
 
 % Plot Constellation
 figure;
 subplot(2,1,1);
-plot(symbols, 'bo'); % Original constellation
-title('PAM Constellation');
+plot(real(symbols), imag(symbols), 'bo'); % Original constellation
+title('Gray-coded PAM Constellation');
 
 % Plot Constellation with Noise
 subplot(2,1,2);
-plot(noisy_symbols, 'ro'); % Constellation with noise
-title('Noisy PAM Constellation');
+plot(real(noisy_symbols), imag(noisy_symbols), 'ro'); % Constellation with noise
+title('Noisy Gray-coded PAM Constellation');
 
 % Show plots
-sgtitle('PAM Constellation and Noisy Constellation');
+sgtitle('Gray-coded PAM Constellation and Noisy Constellation');
