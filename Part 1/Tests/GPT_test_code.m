@@ -1,6 +1,6 @@
 % close all
 % Parameters
-M = 4; % Modulation order
+M = 32; % Modulation order
 SNR_dB = 25; % Signal-to-noise ratio in dB
 initial_phase = 0; % Initial phase in radians
 
