@@ -32,6 +32,7 @@ noisy_symbols = awgn(modulated_signal, SNR_db, 'measured'); % The  'measured' is
 demodulated_signal = qamdemod(noisy_symbols, M, 'UnitAveragePower', useUnitAveragePower);
 
 
+% ============ END of simulation ============
 
 % Compare the original and demodulated symbols
 [~,SER] = symerr(symbols,demodulated_signal) ;
@@ -40,7 +41,6 @@ disp(['SER: '  num2str(100*SER) '%'])
 disp(['BER: '  num2str(100*BER) '%'])
 
 
-% ============ END of simulation ============
 
 if make_plots
     % Plot only the Constellation with Noise
