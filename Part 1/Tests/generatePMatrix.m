@@ -108,7 +108,7 @@ function P = generatePMatrix(n, k, target_dmin, maxAttempts)
             best_dmin = current_dmin;
             bestP = currentP;
             if best_dmin == target_dmin
-                disp("The code is perfect <============================") %This means that it reaches the upper bound 
+                % disp("The code is perfect!") %This means that it reaches the upper bound 
                 break
             end
         end
