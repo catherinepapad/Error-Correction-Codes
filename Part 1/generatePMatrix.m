@@ -28,8 +28,8 @@ function P = generatePMatrix(n, k, target_dmin, maxAttempts)
 %       if the code is found to be perfect, reaching the upper bound for dmin.
 %
 %   Example1:
-%       n = 7;
-%       k = 4;
+%       n = 7; % Codeword length
+%       k = 4; % Message length
 %       target_dmin = 3;
 %       maxAttempts = 1000;
 %       P = generatePMatrix(n, k, target_dmin, maxAttempts);
@@ -79,10 +79,10 @@ function P = generatePMatrix(n, k, target_dmin, maxAttempts)
 %       findMinHammingDistance
 
     arguments
-        n               (1,1) {mustBeInteger, mustBePositive}
-        k               (1,1) {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(k,2)}
-        target_dmin     (1,1) {mustBeInteger, mustBePositive} = getTargetDmin(n, k)
-        maxAttempts     (1,1) {mustBeInteger, mustBePositive} = 500
+        n               (1,1)   {mustBeInteger, mustBePositive}
+        k               (1,1)   {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(k,2)}
+        target_dmin     (1,1)   {mustBeInteger, mustBePositive} = getTargetDmin(n, k)
+        maxAttempts     (1,1)   {mustBeInteger, mustBePositive} = 500
     end
     
     % If n==k then the code is just I_k and thus P is empty 
@@ -107,7 +107,7 @@ function P = generatePMatrix(n, k, target_dmin, maxAttempts)
         if current_dmin > best_dmin
             best_dmin = current_dmin;
             bestP = currentP;
-            if best_dmin == target_dmin
+            if best_dmin == target_dmin - 2
                 % disp("The code is perfect!") %This means that it reaches the upper bound 
                 break
             end
@@ -123,9 +123,9 @@ function target_dmin = getTargetDmin(n, k)
     % Calculate the Singleton bound
     if k <= 2
         % Special case
-        Singleton_bound = n - 2;
+        Singleton_bound = n ;
     else
-        Singleton_bound = n - k + 1 - 2;
+        Singleton_bound = n - k + 1 ;
     end
     
     % Use the Singleton bound as the default target_dmin
