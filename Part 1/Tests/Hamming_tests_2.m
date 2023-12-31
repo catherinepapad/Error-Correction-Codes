@@ -1,6 +1,6 @@
 % Parameters
 close all
-M = 16; % Modulation order for 4-QAM
+M = 2; % Modulation order for 2-QAM
 EbNo = 10; % Eb/No in dB
 
 % Hamming (7,4) Code Generator Matrix
