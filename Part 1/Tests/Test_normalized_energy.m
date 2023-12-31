@@ -1,6 +1,6 @@
 % Parameters
 close all ; 
-SNR_dB = 10 ; 
+SNR_dB = 20 ; 
 symbols_send = 10^3 ; 
 bits_per_symbol = 4 ;   
 M = 2^bits_per_symbol; % Order of modulation (e.g., 16 for 16-QAM)
@@ -31,27 +31,17 @@ demodulated_signal = qamdemod(noisy_symbols, M, 'UnitAveragePower', useUnitAvera
 
 
 % Compare the original and demodulated symbols
-disp(['SER:'  num2str(sum(symbols~=demodulated_signal) * 100 / symbols_send) '%'])
+disp(['SER: '  num2str(sum(symbols~=demodulated_signal) * 100 / symbols_send) '%'])
 
 
 
-% Plot Constellation
-figure;
-subplot(2,1,1);
-plot(real(constalletion_points), imag(constalletion_points), 'bo'); % Original constellation
-% xlim([-40 40]);
-axis equal
-title('Gray-coded QAM Constellation');
-
-% Plot Constellation with Noise
-subplot(2,1,2);
+% Plot only the Constellation with Noise
+figure; 
 plot(real(noisy_symbols), imag(noisy_symbols), 'ro'); % Constellation with noise
 hold on ;
 plot(real(constalletion_points), imag(constalletion_points), 'bx'); % Original constellation
-% xlim([-40 40]);
 axis equal
-title('Noisy Gray-coded QAM Constellation');
+title( sprintf('Noisy Gray-coded QAM Constellation SNR: %.2f db', SNR_dB) );
 
-% Show plots
-sgtitle('Gray-coded QAM Constellation and Noisy Constellation');
+
 
