@@ -19,7 +19,8 @@ disp(['Constalletion mean energy: ', num2str(constalletion_energy)])
 modulated_signal = qammod(symbols, M, 'UnitAveragePower', useUnitAveragePower);
 
 % Demodulation
-demodulated_signal = qamdemod(modulated_signal, M, 'UnitAveragePower', useUnitAveragePower,'NoiseVariance',100);
+demodulated_signal = qamdemod(modulated_signal, M, 'UnitAveragePower', useUnitAveragePower);
+
 
 % Compare the original and demodulated symbols
 disp(['SER:'  num2str(sum(symbols~=demodulated_signal) * 100 / symbols_send) '%'])
