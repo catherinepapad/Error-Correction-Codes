@@ -3,15 +3,19 @@
 
 
 % Define parameters
-n = 7; % Length of codeword
-k = 4; % Message length
+n = 2; % Length of codeword
+k = 2; % Message length
+
+% m = 4 ;  % m>=2 
+% n= 2^m -1 
+% k = n - m  
 
 % Generate systematic generator matrix G with a large minimum Hamming distance
 
 I_k = eye(k); % Identity matrix of size k
 
 % Create a matrix P with rows carefully chosen to maximize minimum Hamming distance
-P = generatePMatrix(n, k);  % k x (n-k) dimentions
+P = generatePMatrix(n, k );  % k x (n-k) dimentions
 
 % Generate the systematic generator matrix G
 G = [I_k, P]
@@ -19,56 +23,39 @@ G = [I_k, P]
 d_min = findMinHammingDistance(G)
 
 
-
-function P = generatePMatrix_old(n, k)
+function P = generatePMatrix(n, k, target_dmin , maxAttempts)
     arguments
-        n (1,1) {mustBeInteger,mustBePositive}
-        k (1,1) {mustBeInteger,mustBePositive}
+        n               (1,1) {mustBeInteger,mustBePositive}
+        k               (1,1) {mustBeInteger,mustBePositive,mustBeGreaterThanOrEqual(k,2)}
+        target_dmin     (1,1) {mustBeInteger,mustBePositive} = 2
+        maxAttempts     (1,1) {mustBeInteger,mustBePositive} = 500
     end
-    if ~(n>k)
-        error("n must be greater than k  (n>k)")
-    end
-    
-    % Generate a random matrix
-    P = randi([0, 1], k, n - k);
 
+    % If n==k then the code is just I_k and thus P is empty 
+    if ( n == k )
+        P = [];
+        return 
+    end
+
+    % The minus 2 at the end is because we check only for the matrix P 
+    if target_dmin == 2 
+        % Find an upper bound for the best dmin 
+        if k <= 2 
+            % This is a special case 
+            Singleton_bound = n - 2 ;
+        else
+            Singleton_bound = n-k+1 -2 ;
+        end
+    else
+        % This is from the function argument
+        Singleton_bound = target_dmin - 2 ; 
+    end
 
     % % Perform row operations to maximize minimum Hamming distance
     % P = rref(P);  % This might also be a fancy idea
 
-    % Ensure that columns are linearly independent
-    while rank(P) < min(k , n - k)
-        P = randi([0, 1], k, n - k);
-    end
-end
-
-
-function P = generatePMatrix(n, k, maxAttempts)
-    arguments
-        n               (1,1) {mustBeInteger,mustBePositive}
-        k               (1,1) {mustBeInteger,mustBePositive}
-        maxAttempts     (1,1) {mustBeInteger,mustBePositive} = 500
-    end
-    if ~(n > k)
-        error("n must be greater than k (n > k)")
-    end
-    if (k == 1)
-        error("k can not be 1, it must be k>1")
-    end
-
     bestP = [];
     best_dmin = -1;
-
-
-
-    % The minus 2 at the end is because we check only for the matrix P 
-    if k <= 2 
-        % This is a special case 
-        Singleton_bound = n - 2 ;
-    else
-        Singleton_bound = n-k+1 -2 ;
-    end
-
 
     for attempt = 1:maxAttempts
         % Generate a random matrix
@@ -82,7 +69,6 @@ function P = generatePMatrix(n, k, maxAttempts)
             bestP = currentP;
             if best_dmin == Singleton_bound 
                 disp("The code is perfect <============================")
-                attempt
                 break
             end
         end
