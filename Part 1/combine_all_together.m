@@ -6,22 +6,14 @@
 % close all ; 
 
 % Simulation parameters 
-n = 5;                  % Codeword length
-k = 3;                  % Message length
-SNR_db = 30 ;           % SNR in db
+n = 5;              % Codeword length
+k = 3;              % Message length
+SNR_db = 30 ;       % SNR in db
+bits_per_symbol = 10 ;              % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
 D_number_of_bits_to_send = 10^5 ;   % Number of symbols to send
-bits_per_symbol = 10 ;   % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+
 
 gray_encoding = true;
-
-
-if gray_encoding
-    symbol_encoding = 'gray';
-else
-    symbol_encoding = 'bin'; 
-end
-
-
 useUnitAveragePower = true; % Set to false if you don't want unit average power
 
 % Output parameters
@@ -30,6 +22,11 @@ make_plots = true ;
 % Auto generated parameters
 M = 2^bits_per_symbol;  % Order of modulation (e.g., 16 for 16-QAM)
 
+if gray_encoding
+    symbol_encoding = 'gray';
+else
+    symbol_encoding = 'bin'; 
+end
 
 D_min = k  * bits_per_symbol / gcd(n, bits_per_symbol);
 D_number_of_bits_to_send = ceil(D_number_of_bits_to_send / D_min) * D_min;
