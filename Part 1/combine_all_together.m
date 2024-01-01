@@ -8,9 +8,9 @@
 % Simulation parameters 
 n = 5;              % Codeword length
 k = 3;              % Message length
-SNR_db = 30 ;       % SNR in db
-bits_per_symbol = 10 ;              % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
-D_number_of_bits_to_send = 10^5 ;   % Number of symbols to send
+SNR_db = 12 ;       % SNR in db
+bits_per_symbol = 3 ;               % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+D_number_of_bits_to_send = 10^3 ;   % Number of symbols to send
 
 
 gray_encoding = true;
@@ -20,7 +20,7 @@ useUnitAveragePower = true; % Set to false if you don't want unit average power
 make_plots = true ; 
 
 % Auto generated parameters
-M = 2^bits_per_symbol;  % Order of modulation (e.g., 16 for 16-QAM)
+M = 2^bits_per_symbol;      % Order of modulation 
 
 if gray_encoding
     symbol_encoding = 'gray';
@@ -95,15 +95,5 @@ if make_plots
     axis equal
     title( sprintf('Noisy Gray-coded QAM constellation SNR: %.2f db', SNR_db) );
 end
-
-
-% =================== Original ideas ===================
-
-% % Calculate D based on the provided formula
-% D_min = k  * bits_per_symbol / gcd(n, bits_per_symbol);
-% 
-% % Check the conditions
-% condition1 = mod(D_min, k) == 0;
-% condition2 = mod(D_min * n / k, bits_per_symbol) == 0;
 
 
