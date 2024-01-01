@@ -81,7 +81,7 @@ function P = generatePMatrix(n, k, target_dmin, maxAttempts)
     arguments
         n               (1,1)   {mustBeInteger, mustBePositive}
         k               (1,1)   {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(k,2)}
-        target_dmin     (1,1)   {mustBeInteger, mustBePositive} = getTargetDmin(n, k)
+        target_dmin     (1,1)   {mustBeInteger, mustBePositive} = n - k + 1  %getTargetDmin(n, k)
         maxAttempts     (1,1)   {mustBeInteger, mustBePositive} = 500
     end
     
@@ -91,25 +91,25 @@ function P = generatePMatrix(n, k, target_dmin, maxAttempts)
         return;
     end
     
-    % Perform row operations to maximize minimum Hamming distance
-    % P = rref(P);  % This might also be a fancy idea
     
     bestP = [];
     best_dmin = -1;
 
-
-    I_k = eye(k); % Identity matrix of size k
+    % Identity matrix of size k
+    I_k = eye(k); 
     % Generate all possible binary vectors of length k
     binary_vectors = dec2bin(0:2^k-1, k) - '0';
     
     for attempt = 1:maxAttempts
-        % Generate a random matrix
+        % Generate a random matrix P
         currentP = randi([0, 1], k, n - k);
     
-        % Extraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        % Generate the systematic generator matrix G
         G = [I_k, currentP];
+        % Generate all possible codewords
         all_codewords = mod(binary_vectors*G,2) ;
 
+        % Calculate the minimum Hamming distance of the generated code
         current_dmin = findMinHammingDistance(all_codewords) ; 
     
         % Update the best solution if the current one is better
@@ -128,15 +128,9 @@ function P = generatePMatrix(n, k, target_dmin, maxAttempts)
     
 end
 
-function target_dmin = getTargetDmin(n, k)
-    % Calculate the Singleton bound
-    if k <= 2
-        % Special case
-        Singleton_bound = n ;
-    else
-        Singleton_bound = n - k + 1 ;
-    end
-    
-    % Use the Singleton bound as the default target_dmin
-    target_dmin = Singleton_bound;
-end
+
+% function Singleton_bound = getTargetDmin(n, k)
+%     % Use the Singleton bound as the default target_dmin
+%     % Calculate the Singleton bound    
+%     Singleton_bound = n - k + 1 ;
+% end
