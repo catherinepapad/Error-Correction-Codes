@@ -43,7 +43,13 @@ function [G , H , d_min] = createGeneratorMatrix(n,k)
     % Generate the parity check matrix H
     H = [ P'  eye(n-k) ];
 
+
+    % Generate all possible binary vectors of length k
+    binary_vectors = dec2bin(0:2^k-1, k) - '0';
+    % Generate all possible codewords
+    all_codewords = mod(binary_vectors*G,2) ;
+
     % Calculate the minimum Hamming distance of the generated code
-    d_min = findMinHammingDistance(G);
+    d_min = findMinHammingDistance(all_codewords);
 
 end

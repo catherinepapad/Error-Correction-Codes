@@ -96,18 +96,27 @@ function P = generatePMatrix(n, k, target_dmin, maxAttempts)
     
     bestP = [];
     best_dmin = -1;
+
+
+    I_k = eye(k); % Identity matrix of size k
+    % Generate all possible binary vectors of length k
+    binary_vectors = dec2bin(0:2^k-1, k) - '0';
     
     for attempt = 1:maxAttempts
         % Generate a random matrix
         currentP = randi([0, 1], k, n - k);
     
-        current_dmin = findMinHammingDistance(currentP) ; 
+        % Extraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        G = [I_k, currentP];
+        all_codewords = mod(binary_vectors*G,2) ;
+
+        current_dmin = findMinHammingDistance(all_codewords) ; 
     
         % Update the best solution if the current one is better
         if current_dmin > best_dmin
             best_dmin = current_dmin;
             bestP = currentP;
-            if best_dmin == target_dmin - 2
+            if best_dmin == target_dmin
                 % disp("The code is perfect!") %This means that it reaches the upper bound 
                 break
             end
