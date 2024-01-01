@@ -33,7 +33,7 @@ transmitted_data_length = transmitted_data_length + k - mod(transmitted_data_len
 
 
 % Message to be encoded
-message = randi([0, 1], 1, transmited_data_length ); % Your actual message vector
+message = randi([0, 1], 1, transmited_data_length );
 
 % Encode the message using the linear block code
 encodedMessage = encode(message, n, k, 'linear/binary', G);
