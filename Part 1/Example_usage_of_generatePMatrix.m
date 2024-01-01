@@ -12,7 +12,7 @@ disp(['k: ' num2str(k)]);
 
 % Step 1: Generate the matrix P
 disp('Generating matrix P:');
-P = generatePMatrix(n, k);
+P = generatePMatrix(n, k, 'maxAttempts', 500);
 
 % Display the generated matrix P
 disp('Generated matrix P:');
@@ -29,8 +29,13 @@ G = [I_k, P];
 disp('Generated systematic generator matrix G:');
 disp(G);
 
+% Generate all possible binary vectors of length k
+binary_vectors = dec2bin(0:2^k-1, k) - '0';
+% Generate all possible codewords
+all_codewords = mod(binary_vectors*G,2) ;
+
 % Calculate the minimum Hamming distance of the generated code
-d_min = findMinHammingDistance(G);
+d_min = findMinHammingDistance(all_codewords);
 disp(['Minimum Hamming Distance (d_min): ' num2str(d_min)]);
 
 % Additional information
