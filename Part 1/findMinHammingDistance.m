@@ -1,11 +1,11 @@
-function d_min = findMinHammingDistance(G)
+function d_min = findMinHammingDistance(A)
 % findMinHammingDistance - Calculate the minimum Hamming distance for a set of codewords.
 %
-%   d_min = findMinHammingDistance(G) calculates the minimum Hamming distance
-%   between all pairs of distinct codewords represented by the matrix G.
+%   d_min = findMinHammingDistance(A) calculates the minimum Hamming distance
+%   between all pairs of distinct codewords represented by the matrix A.
 %
 %   Parameters:
-%       G     - Matrix representing codewords, where each row corresponds
+%       A     - Matrix representing codewords, where each row corresponds
 %               to a codeword (must be an integer matrix).
 %
 %   Output:
@@ -18,18 +18,24 @@ function d_min = findMinHammingDistance(G)
 %       the size of the codewords to obtain the minimum Hamming distance.
 %
 %   Example:
-%       G = [1 0 1; 0 1 1; 1 1 0]; % Example codewords
-%       d_min = findMinHammingDistance(G); % Expected output is 2 
+%       A = [1 0 1; 0 1 1; 1 1 0]; % Example codewords
+%       d_min = findMinHammingDistance(A); % Expected output is 2 
 %
 %   See also:
 %       pdist
 
-    arguments
-        G (:,:) {mustBeInteger}
+    % Input validation
+    arguments (Input)
+        A           (:,:)           {mustBeInteger}
     end
+    % Output validation
+    arguments (Output)
+        d_min       (1,1)   double  {mustBeInteger, mustBeNonnegative} 
+    end
+
     % Calculate pairwise Hamming distances using pdist
-    distances = pdist(G, 'hamming');
+    distances = pdist(A, 'hamming');
 
     % Find the minimum Hamming distance
-    d_min = min(distances) * size(G, 2);
+    d_min = min(distances) * size(A, 2);
 end

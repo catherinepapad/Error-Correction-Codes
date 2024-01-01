@@ -86,14 +86,19 @@ function P = generatePMatrix(n, k, options)
 %   See also:
 %       findMinHammingDistance
 
-
-    arguments
+    % Input validation
+    arguments (Input)
         n                       (1,1)   double  {mustBeInteger, mustBePositive}
         k                       (1,1)   double  {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(k,2)}
         options.target_dmin     (1,1)   double  {mustBeInteger, mustBePositive} = n - k + 1  %getTargetDmin(n, k)
         options.maxAttempts     (1,1)   double  {mustBeInteger, mustBePositive} = 500
     end
-    
+
+    % Output validation
+    arguments (Output)
+        P                       (:,:)   double  {mustBeMember(P, [0, 1])} 
+    end
+
     % If n==k then the code is just I_k and thus P is empty 
     if (n == k)
         P = [];

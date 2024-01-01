@@ -1,4 +1,4 @@
-function [G , H , d_min] = createGeneratorMatrix(n,k)
+function [G , H , d_min] = createGeneratorMatrix(n,k, options)
 % createGeneratorMatrix - Generate systematic generator matrix and parity
 %                         check matrix for a linear block code.
 %
@@ -25,9 +25,18 @@ function [G , H , d_min] = createGeneratorMatrix(n,k)
 %   See also:
 %       generatePMatrix, findMinHammingDistance
    
-    arguments
-        n       (1,1)   {mustBeInteger, mustBePositive}
-        k       (1,1)   {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(k,2)}
+    % Input validation
+    arguments (Input)
+        n                       (1,1)   double  {mustBeInteger, mustBePositive}
+        k                       (1,1)   double  {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(k,2)}
+        options.maxAttempts     (1,1)   double  {mustBeInteger, mustBePositive}
+    end
+
+    % Output validation
+    arguments (Output)
+        G                       (:,:)   double  {mustBeMember(G, [0, 1])} 
+        H                       (:,:)   double  {mustBeMember(H, [0, 1])} 
+        d_min                   (1,1)   double  {mustBeInteger, mustBePositive} 
     end
 
     % Generate systematic generator matrix G with a large minimum Hamming distance
