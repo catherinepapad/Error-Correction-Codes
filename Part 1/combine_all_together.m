@@ -20,6 +20,10 @@ useUnitAveragePower = true; % Set to false if you don't want unit average power
 make_plots = true ; 
 print_code_info = true ; 
 
+
+
+% ============ ============ ============
+
 % Auto generated parameters
 M = 2^bits_per_symbol;      % Order of modulation 
 
@@ -39,14 +43,14 @@ D_number_of_bits_to_send = ceil(D_number_of_bits_to_send / D_min) * D_min;
 % The final 'D_number_of_bits_to_send' will be the smallest multiple of 'D_min' greater than or equal to
 % the initially specified length.
 
-
+% The information we want to send in bits
 message_in_bits = randi([0 1], D_number_of_bits_to_send, 1); % Generate random symbols
 
 
 % Calculate the mean energy of the constalletion
 constellation_points = qammod(0:M-1 , M ,'UnitAveragePower', useUnitAveragePower,'PlotConstellation',make_plots); 
 constellation_energy = mean(abs(constellation_points).^2) ; 
-disp(['Constalletion mean energy: ', num2str(constellation_energy)])
+disp(['Constalletion mean energy: ', num2str(constellation_energy)]);
 
 
 
@@ -71,7 +75,6 @@ encoded_demodulated_signal = qamdemod(noisy_symbols, M, symbol_encoding, 'Output
 
 % Compare the original and demodulated symbols before ECC
 [~,BER_non_ECC] = biterr(encodedMessage,encoded_demodulated_signal) ;
-disp(['BER with no ECC: '  num2str(100*BER_non_ECC) '%'])
 
 
 % Decode the received codewords using the linear block code
@@ -80,8 +83,6 @@ decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
 
 % Compare the original and demodulated symbols after ECC 
 [~,BER_with_ECC] = biterr(message_in_bits,decodedMessage) ;
-disp(['BER with ECC: '  num2str(100*BER_with_ECC) '%'])
-
 
 
 % ============ END of simulation ============
@@ -123,4 +124,10 @@ if print_code_info
     disp(T);
 
 end
+
+
+disp(['BER with no ECC: '  num2str(100*BER_non_ECC) '%']);
+disp(['BER with ECC:    '  num2str(100*BER_with_ECC) '%']);
+
+
 
