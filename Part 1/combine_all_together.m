@@ -3,14 +3,14 @@
 
 % To suppress warnings about unreachable code
 %#ok<*UNRCH>
-% close all ; 
+close all ; 
 
 % Simulation parameters 
-n = 5;              % Codeword length
-k = 3;              % Message length
-SNR_db = 12 ;       % SNR in db
-bits_per_symbol = 3 ;               % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
-D_number_of_bits_to_send = 10^3 ;   % Number of symbols to send
+n = 7;              % Codeword length
+k = 4;              % Message length
+SNR_db = 20 ;       % SNR in db
+bits_per_symbol = 5 ;               % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+D_number_of_bits_to_send = 10^4 ;   % Number of symbols to send
 
 
 gray_encoding = true;
@@ -18,6 +18,7 @@ useUnitAveragePower = true; % Set to false if you don't want unit average power
 
 % Output parameters
 make_plots = true ; 
+print_code_info = true ; 
 
 % Auto generated parameters
 M = 2^bits_per_symbol;      % Order of modulation 
@@ -96,4 +97,30 @@ if make_plots
     title( sprintf('Noisy Gray-coded QAM constellation SNR: %.2f db', SNR_db) );
 end
 
+
+if print_code_info
+    % Display the matrix G
+    fprintf('G = \n');
+    disp(G);
+
+    % Display the matrix G
+    fprintf('G = \n');
+    disp(num2str(G, '%d')) ;
+
+    % Add an extra empty line 
+    fprintf('\n');
+
+    % Generate all possible binary vectors of length k
+    binary_vectors = dec2bin(0:2^k-1, k) - '0';
+
+    % Generate all possible codewords
+    all_codewords= mod(binary_vectors*G,2) ;
+    
+    % Create a table
+    T = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
+    
+    % Display the table
+    disp(T);
+
+end
 
