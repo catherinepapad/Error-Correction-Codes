@@ -3,36 +3,70 @@
 
 % To suppress warnings about unreachable code
 %#ok<*UNRCH>
+clear;
 close all ; 
 
 % Simulation parameters 
-n = 7;              % Codeword length
-k = 4;              % Message length
-SNR_db = 20 ;       % SNR in db
-bits_per_symbol = 5 ;               % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
-D_number_of_bits_to_send = 10^4 ;   % Number of symbols to send
-
+n_array = 7:8;              % Codeword length
+k = 4;                      % Message length
+SNR_db_array = 10:3:20 ;          % SNR in db
+bits_per_symbol_array = 3:5 ;               % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+D_number_of_bits_to_send = 10^3 ;   % Number of symbols to send
+Ts = 2*10^-6 ;  % Symbol duration in seconds
 
 gray_encoding = true;
 useUnitAveragePower = true; % Set to false if you don't want unit average power
 
 % Output parameters
 make_plots = true ; 
-print_code_info = true ; 
-
-
+print_code_info = false ; 
+print_rates = false;
 
 % ============ ============ ============
 
-% Auto generated parameters
-M = 2^bits_per_symbol;      % Order of modulation 
+% Matrices to store the results
+ALL_BER_with_ECC        =  zeros(length(SNR_db_array) , length(bits_per_symbol_array) ,length(n_array) ) ; 
+ALL_BER_with_not_ECC    =  zeros(length(SNR_db_array) , length(bits_per_symbol_array) ,length(n_array) ) ; 
+ALL_Rb_code             =  zeros(length(SNR_db_array) , length(bits_per_symbol_array) ,length(n_array) ) ; 
 
+
+% Auto generated parameters
 if gray_encoding
     symbol_encoding = 'gray';
 else
     symbol_encoding = 'bin'; 
 end
 
+% Iterate over the differend Orders of modulations values
+for bits_per_symbol_index = 1:length(bits_per_symbol_array)
+    bits_per_symbol = bits_per_symbol_array(bits_per_symbol_index); 
+
+
+    % Iterate over the differend Codeword lengths 
+    for n_index = 1:length(n_array)
+        n = n_array(n_index); 
+        
+
+    end
+
+end
+% Calculate bit duration (Tb)
+Tb = Ts / bits_per_symbol;  % [sec/bits]
+
+% Calculate code rate (R) 
+R = k / n;
+
+% Calculate bit rate of the communication channel (Rb) in bits per second
+Rb = 1 / Tb;    % [bits/sec]
+
+% Calculate bit rate of the usefull information (Rb_code) in bits per second
+Rb_code = R * Rb ;  % [bits/sec]
+
+% Order of modulation
+M = 2^bits_per_symbol;       
+
+
+% Minimum number of bits needed to send to be able to create code words and symbols without zero padding
 D_min = k  * bits_per_symbol / gcd(n, bits_per_symbol);
 D_number_of_bits_to_send = ceil(D_number_of_bits_to_send / D_min) * D_min;
 
@@ -54,80 +88,90 @@ disp(['Constalletion mean energy: ', num2str(constellation_energy)]);
 
 
 
-% ============ Start of simulation ============
-
 % Define the generator matrix G
 % Define the parity check matrix H
 [G , H , d_min] = createGeneratorMatrix(n,k);
 
 
-% Encode the message using the linear block code
-encodedMessage = encode(message_in_bits, n, k, 'linear/binary', G);
-
-% Modulate to symbols using QAM
-modulated_signal = qammod(encodedMessage, M,symbol_encoding,'InputType','bit', 'UnitAveragePower', useUnitAveragePower);
-
-% Adding AWGN
-noisy_symbols = awgn(modulated_signal, SNR_db, 'measured'); % The  'measured' is not needed if we normalize the constellation
-
-% Demodulation
-encoded_demodulated_signal = qamdemod(noisy_symbols, M, symbol_encoding, 'OutputType', 'bit','UnitAveragePower', useUnitAveragePower);
-
-% Compare the original and demodulated symbols before ECC
-[~,BER_non_ECC] = biterr(encodedMessage,encoded_demodulated_signal) ;
-
-
-% Decode the received codewords using the linear block code
-decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
-
-
-% Compare the original and demodulated symbols after ECC 
-[~,BER_with_ECC] = biterr(message_in_bits,decodedMessage) ;
+for SNR_index = 1:length(SNR_db_array)
+    SNR_db = SNR_db_array(SNR_index); 
+% ============ Start of simulation ============
+    
+    % Encode the message using the linear block code
+    encodedMessage = encode(message_in_bits, n, k, 'linear/binary', G);
+    
+    % Modulate to symbols using QAM
+    modulated_signal = qammod(encodedMessage, M,symbol_encoding,'InputType','bit', 'UnitAveragePower', useUnitAveragePower);
+    
+    % Adding AWGN
+    noisy_symbols = awgn(modulated_signal, SNR_db, 'measured'); % The  'measured' is not needed if we normalize the constellation
+    
+    % Demodulation
+    encoded_demodulated_signal = qamdemod(noisy_symbols, M, symbol_encoding, 'OutputType', 'bit','UnitAveragePower', useUnitAveragePower);
+    
+    % Compare the original and demodulated symbols before ECC
+    [~,BER_non_ECC] = biterr(encodedMessage,encoded_demodulated_signal) ;
+    
+    
+    % Decode the received codewords using the linear block code
+    decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
+    
+    
+    % Compare the original and demodulated symbols after ECC 
+    [~,BER_with_ECC] = biterr(message_in_bits,decodedMessage) ;
 
 
 % ============ END of simulation ============
 
-
-if make_plots
-    % Plot only the Constellation with Noise
-    figure; 
-    plot(real(noisy_symbols), imag(noisy_symbols), 'ro'); % Constellation with noise
-    hold on ;
-    plot(real(constellation_points), imag(constellation_points), 'bx'); % Original constellation
-    axis equal
-    title( sprintf('Noisy Gray-coded QAM constellation SNR: %.2f db', SNR_db) );
-end
-
-
-if print_code_info
-    % Display the matrix G
-    fprintf('G = \n');
-    disp(G);
-
-    % Display the matrix G
-    fprintf('G = \n');
-    disp(num2str(G, '%d')) ;
-
-    % Add an extra empty line 
-    fprintf('\n');
-
-    % Generate all possible binary vectors of length k
-    binary_vectors = dec2bin(0:2^k-1, k) - '0';
-
-    % Generate all possible codewords
-    all_codewords= mod(binary_vectors*G,2) ;
     
-    % Create a table
-    T = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
+    if make_plots
+        % Plot only the Constellation with Noise
+        figure; 
+        plot(real(noisy_symbols), imag(noisy_symbols), 'ro'); % Constellation with noise
+        hold on ;
+        plot(real(constellation_points), imag(constellation_points), 'bx'); % Original constellation
+        axis equal
+        title( sprintf('Noisy Gray-coded QAM constellation SNR: %.2f db', SNR_db) );
+    end
     
-    % Display the table
-    disp(T);
+    
+    if print_code_info
+        % Display the matrix G
+        fprintf('G = \n');
+        disp(G);
+    
+        % Display the matrix G
+        fprintf('G = \n');
+        disp(num2str(G, '%d')) ;
+    
+        % Add an extra empty line 
+        fprintf('\n');
+    
+        % Generate all possible binary vectors of length k
+        binary_vectors = dec2bin(0:2^k-1, k) - '0';
+    
+        % Generate all possible codewords
+        all_codewords= mod(binary_vectors*G,2) ;
+        
+        % Create a table
+        T = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
+        
+        % Display the table
+        disp(T);
+    
+    end
+    
+    
+    fprintf('SNR: %.2f db\n', SNR_db);
+    disp(['BER with no ECC: '  num2str(100*BER_non_ECC) '%']);
+    disp(['BER with ECC:    '  num2str(100*BER_with_ECC) '%']);
+    
+    if print_rates
+        fprintf('Code Rate (R): %.4f\n', R);
+        fprintf('Code Bit Rate (Rb): %.2f bits/second\n', Rb_code);
+        fprintf('Bit Rate (Rb):      %.2f bits/second\n', Rb);
+    end
 
 end
-
-
-disp(['BER with no ECC: '  num2str(100*BER_non_ECC) '%']);
-disp(['BER with ECC:    '  num2str(100*BER_with_ECC) '%']);
-
 
 
