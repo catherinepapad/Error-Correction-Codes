@@ -10,7 +10,7 @@ close all ;
 n_array = 7:10;                     % Codeword length
 k = 4;                              % Message length
 SNR_db_array = 10:2:20 ;            % SNR in db
-bits_per_symbol_array = 3:6 ;               % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+bits_per_symbol_array = 3:6 ;       % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
 D_number_of_bits_to_send = 10^4 ;   % Number of symbols to send
 Ts = 2*10^-6 ;  % Symbol duration in seconds
 
