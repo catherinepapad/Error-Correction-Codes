@@ -7,11 +7,11 @@ clear;
 close all ; 
 
 % Simulation parameters 
-n_array = 7:10;              % Codeword length
-k = 4;                      % Message length
-SNR_db_array = 10:2:20 ;          % SNR in db
+n_array = 7:10;                     % Codeword length
+k = 4;                              % Message length
+SNR_db_array = 10:2:20 ;            % SNR in db
 bits_per_symbol_array = 3:6 ;               % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
-D_number_of_bits_to_send = 10^5 ;   % Number of symbols to send
+D_number_of_bits_to_send = 10^4 ;   % Number of symbols to send
 Ts = 2*10^-6 ;  % Symbol duration in seconds
 
 gray_encoding = true;
@@ -202,40 +202,5 @@ end
 
 
 plot_resutls;
-
-% 
-% % Do some plots !!!!!!!!!
-% 
-% % Plotting BER with and without ECC on subplots with logarithmic scale and markers
-% for i = 1:length(bits_per_symbol_array)
-%     figure;
-%     for j = 1:length(n_array)
-%         subplot(length(n_array), 1, j);
-%         semilogy(SNR_db_array, squeeze(ALL_BER_with_ECC(:, i, j)), 'o-', 'DisplayName', 'BER with ECC');
-%         hold on;
-%         semilogy(SNR_db_array, squeeze(ALL_BER_non_ECC(:, i, j)), 'o-', 'DisplayName', 'BER without ECC');
-%         title(['BER Comparison - bps: ', num2str(bits_per_symbol_array(i)), ', n: ', num2str(n_array(j))]);
-%         xlabel('SNR (dB)');
-%         ylabel('BER');
-%         legend;
-%         grid on;
-%     end
-% end
-% 
-% % Plotting Code Rates on the same graph for all bits per symbol values with markers
-% figure;
-% for i = 1:length(bits_per_symbol_array)
-%     plot(n_array, ALL_Rb_code(i, :), 'o-', 'DisplayName', ['bps: ', num2str(bits_per_symbol_array(i))]);
-%     hold on;
-% end
-% title('Code Rate Comparison');
-% xlabel('n');
-% ylabel('Code Rate');
-% legend;
-% grid on;
-
-
-
-
-
+BER_surf_plot;
 
