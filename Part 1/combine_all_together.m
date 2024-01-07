@@ -155,7 +155,9 @@ for bits_per_symbol_index = 1:length(bits_per_symbol_array)
             
             
             % Decode the received codewords using the linear block code
-            decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
+            % Use the "evalc" function to capture the output from the "disp" function calls that are from the "syndtable" function that the "decode" function calls
+            uselles_output = evalc("decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);");
+            % decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
             
             
             % Compare the original and demodulated symbols after ECC 
@@ -163,7 +165,7 @@ for bits_per_symbol_index = 1:length(bits_per_symbol_array)
         
             
 % Store results to plot later
-            ALL_BER_non_ECC(SNR_index,bits_per_symbol_index,n_index)  = BER_non_ECC;
+            ALL_BER_non_ECC (SNR_index,bits_per_symbol_index,n_index) = BER_non_ECC;
             ALL_BER_with_ECC(SNR_index,bits_per_symbol_index,n_index) = BER_with_ECC ; 
 
             % ============ END of simulation ============
@@ -201,7 +203,7 @@ for bits_per_symbol_index = 1:length(bits_per_symbol_array)
 
 end
 
-
+% Call other scripts that make plots
 plot_resutls;
 if length(bits_per_symbol_array) > 1 &&  length(n_array) > 1
     BER_surf_plot;
