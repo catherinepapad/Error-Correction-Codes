@@ -7,15 +7,17 @@ clear;
 close all ; 
 
 % Simulation parameters 
-n_array = 4:5;                      % Codeword length
+n_array = 4;                      % Codeword length
 k = 2;                              % Message length
 SNR_db_array = 10:2:20 ;            % SNR in db
-bits_per_symbol_array = 3:5 ;       % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
-D_number_of_bits_to_send = 10^4 ;   % Number of symbols to send
+bits_per_symbol_array = 3 ;       % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+D_number_of_bits_to_send_OG = 10^6 ;   % Number of symbols to send
 Ts = 2*10^-6 ;                      % Symbol duration in seconds
 
 gray_encoding = true;
 useUnitAveragePower = true; % Set to false if you don't want unit average power
+% Set the boolean variable to control parallel/serial execution
+useParallel = false;  % Set to false for serial execution
 
 % Output parameters
 print_all = false;
@@ -32,6 +34,12 @@ ALL_BER_non_ECC     =  zeros(length(SNR_db_array) , length(bits_per_symbol_array
 ALL_Rb_code         =  zeros(                       length(bits_per_symbol_array) ,length(n_array) ) ; 
 
 
+% Create arrays of indices for parallel execution
+bits_per_symbol_indices = 1:length(bits_per_symbol_array);
+n_indices = 1:length(n_array);
+SNR_indices = 1:length(SNR_db_array);
+
+
 % Auto generated parameters
 if gray_encoding
     symbol_encoding = 'gray';
@@ -39,9 +47,21 @@ else
     symbol_encoding = 'bin'; 
 end
 
+if useParallel
+    % Use parallel execution with the maximum number of workers
+    pool = gcp();  % Get the current parallel pool
+    Workers = pool.NumWorkers;  % Set M to the maximum number of workers in the pool
+else
+    % Use serial execution
+    Workers = 0;
+end
+
+tic
+ticBytes(gcp('nocreate'));
 % Iterate over the differend Orders of modulations values
-for bits_per_symbol_index = 1:length(bits_per_symbol_array)
+for bits_per_symbol_index = bits_per_symbol_indices % 34.569885 seconds
     bits_per_symbol = bits_per_symbol_array(bits_per_symbol_index);   
+
 
     if print_current_status 
         fprintf('bits per symbol: %.0f \n', bits_per_symbol);
@@ -57,7 +77,7 @@ for bits_per_symbol_index = 1:length(bits_per_symbol_array)
         
 
     % Iterate over the differend Codeword lengths 
-    for n_index = 1:length(n_array)
+    for n_index = n_indices %29.368215 seconds
         n = n_array(n_index); 
 
     
@@ -84,7 +104,7 @@ for bits_per_symbol_index = 1:length(bits_per_symbol_array)
         
         % Minimum number of bits needed to send to be able to create code words and symbols without zero padding
         D_min = k  * bits_per_symbol / gcd(n, bits_per_symbol);
-        D_number_of_bits_to_send = ceil(D_number_of_bits_to_send / D_min) * D_min;
+        D_number_of_bits_to_send = ceil(D_number_of_bits_to_send_OG / D_min) * D_min;
         
         % The purpose of the adjustment is to ensure that the length of the transmitted data
         % is a multiple of 'D_min', which is important.
@@ -129,7 +149,7 @@ for bits_per_symbol_index = 1:length(bits_per_symbol_array)
             
         end
         
-        for SNR_index = 1:length(SNR_db_array)
+        parfor (SNR_index = SNR_indices , Workers) % 15.939097 seconds
             SNR_db = SNR_db_array(SNR_index); 
 
             if print_current_status 
@@ -156,8 +176,8 @@ for bits_per_symbol_index = 1:length(bits_per_symbol_array)
             
             % Decode the received codewords using the linear block code
             % Use the "evalc" function to capture the output from the "disp" function calls that are from the "syndtable" function that the "decode" function calls
-            uselles_output = evalc("decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);");
-            % decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
+            % uselles_output = evalc("decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);");
+            decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
             
             
             % Compare the original and demodulated symbols after ECC 
@@ -202,6 +222,9 @@ for bits_per_symbol_index = 1:length(bits_per_symbol_array)
     end
 
 end
+
+tocBytes(gcp('nocreate'));
+toc
 
 % Call other scripts that make plots
 plot_resutls;
