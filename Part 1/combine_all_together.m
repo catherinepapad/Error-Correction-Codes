@@ -7,22 +7,23 @@ clear;
 close all ; 
 
 % Simulation parameters 
-n_array = 7:10;                     % Codeword length
-k = 4;                              % Message length
+n_array = 4:5;                      % Codeword length
+k = 2;                              % Message length
 SNR_db_array = 10:2:20 ;            % SNR in db
-bits_per_symbol_array = 3:6 ;       % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+bits_per_symbol_array = 3:5 ;       % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
 D_number_of_bits_to_send = 10^4 ;   % Number of symbols to send
-Ts = 2*10^-6 ;  % Symbol duration in seconds
+Ts = 2*10^-6 ;                      % Symbol duration in seconds
 
 gray_encoding = true;
 useUnitAveragePower = true; % Set to false if you don't want unit average power
 
 % Output parameters
-make_plots = false ; 
-print_code_info = false ; 
-print_rates = false;
-print_BER = false ; 
-print_current_status = false ; 
+print_all = false;
+make_plots              = print_all || false ; 
+print_code_info         = print_all || false ; 
+print_rates             = print_all || false ;
+print_BER               = print_all || false ; 
+print_current_status    = print_all || false ; 
 % ============ ============ ============
 
 % Matrices to store the results
@@ -175,7 +176,7 @@ for bits_per_symbol_index = 1:length(bits_per_symbol_array)
                 hold on ;
                 plot(real(constellation_points), imag(constellation_points), 'bx'); % Original constellation
                 axis equal
-                title( sprintf('Noisy %s-coded %d QAM constellation SNR: %.2f db',symbol_encoding, M, SNR_db) );
+                title( sprintf('Noisy %s-coded %d QAM constellation SNR: %.2f db Codeword length: %d',symbol_encoding, M, SNR_db,n) );
             end
             
             
@@ -202,5 +203,7 @@ end
 
 
 plot_resutls;
-BER_surf_plot;
+if length(bits_per_symbol_array) > 1 &&  length(n_array) > 1
+    BER_surf_plot;
+end
 

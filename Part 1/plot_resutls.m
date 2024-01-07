@@ -48,6 +48,7 @@ for i = 1:length(bits_per_symbol_array)
 end
 title('Code Rate Comparison');
 xlabel('n');
+xticks(n_array);
 ylabel('Code Rate');
 legend;
 grid on;

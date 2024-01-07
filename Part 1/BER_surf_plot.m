@@ -6,7 +6,7 @@
 for snr_index = 1:length(SNR_db_array)
     
     % Create a 3D meshgrid for bits_per_symbol and n
-    [bits_per_symbol_mesh, n_mesh] = meshgrid(bits_per_symbol_array, n_array);
+    [n_mesh,bits_per_symbol_mesh ] = meshgrid(n_array,bits_per_symbol_array );
     
     % Plot the 3D surface with logarithmic scale for BER and colors
     figure;
@@ -25,7 +25,9 @@ for snr_index = 1:length(SNR_db_array)
     scatter3(bits_per_symbol_vector, n_vector, BER_vector, 'r*');
     
     xlabel('Bits per Symbol');
+    xticks(bits_per_symbol_array);
     ylabel('n');
+    yticks(n_array);
     zlabel('BER');
     title(['Bit Error Rate vs. Bits per Symbol and n, SNR = ' num2str(SNR_db_array(snr_index))]);
     
