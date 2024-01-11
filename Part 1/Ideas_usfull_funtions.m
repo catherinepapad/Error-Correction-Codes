@@ -2,7 +2,7 @@
 % Ideas
 
 
-% [h,g,n,k] = hammgen(3) 
+% [h,g,n,k] = hammgen(4) 
 
 % syndtable %Produce syndrome decoding table
 

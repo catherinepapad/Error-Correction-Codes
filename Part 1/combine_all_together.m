@@ -7,11 +7,11 @@ clear;
 close all ; 
 
 % Simulation parameters 
-n_array = 4;                      % Codeword length
+n_array = 4:6;                      % [array] Codeword length
 k = 2;                              % Message length
-SNR_db_array = 10:2:20 ;            % SNR in db
-bits_per_symbol_array = 3 ;       % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
-D_number_of_bits_to_send_OG = 10^6 ;   % Number of symbols to send
+SNR_db_array = 10:2:20 ;            % [array] SNR in db
+bits_per_symbol_array = 3:6 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+D_number_of_bits_to_send_OG = 10^5 ;% Number of symbols to send
 Ts = 2*10^-6 ;                      % Symbol duration in seconds
 
 gray_encoding = true;
@@ -20,7 +20,7 @@ useUnitAveragePower = true; % Set to false if you don't want unit average power
 useParallel = false;  % Set to false for serial execution
 
 % Output parameters
-print_all = false;
+print_all = true;
 make_plots              = print_all || false ; 
 print_code_info         = print_all || false ; 
 print_rates             = print_all || false ;
@@ -124,28 +124,28 @@ for bits_per_symbol_index = bits_per_symbol_indices % 34.569885 seconds
         [G , H , d_min] = createGeneratorMatrix(n,k);
 
         if print_code_info
-                % % Display the matrix G
-                % fprintf('G = \n');
-                % disp(G);
+            % % Display the matrix G
+            % fprintf('G = \n');
+            % disp(G);
+        
+            % Display the matrix G
+            fprintf('G = \n');
+            disp(num2str(G, '%d')) ;
+        
+            % Add an extra empty line 
+            fprintf('\n');
+        
+            % Generate all possible binary vectors of length k
+            binary_vectors = dec2bin(0:2^k-1, k) - '0';
+        
+            % Generate all possible codewords
+            all_codewords= mod(binary_vectors*G,2) ;
             
-                % Display the matrix G
-                fprintf('G = \n');
-                disp(num2str(G, '%d')) ;
+            % Create a table
+            T = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
             
-                % Add an extra empty line 
-                fprintf('\n');
-            
-                % Generate all possible binary vectors of length k
-                binary_vectors = dec2bin(0:2^k-1, k) - '0';
-            
-                % Generate all possible codewords
-                all_codewords= mod(binary_vectors*G,2) ;
-                
-                % Create a table
-                T = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
-                
-                % Display the table
-                disp(T);
+            % Display the table
+            disp(T);
             
         end
         
@@ -202,10 +202,6 @@ for bits_per_symbol_index = bits_per_symbol_indices % 34.569885 seconds
             end
             
             
-            
-            
-            
-
             if print_BER
                 disp(['BER with no ECC: '  num2str(100*BER_non_ECC) '%']);
                 disp(['BER with ECC:    '  num2str(100*BER_with_ECC) '%']);

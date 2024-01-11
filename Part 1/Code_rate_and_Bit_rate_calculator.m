@@ -19,9 +19,9 @@ Rb = 1 / Tb;    % [bits/sec]
 Rb_code = R * Rb ;  % [bits/sec]
 
 
-fprintf('Code Rate (R): %.4f\n', R);
-fprintf('Code Bit Rate (Rb): %.2f bits/second\n', Rb_code);
-fprintf('Bit Rate (Rb):      %.2f bits/second\n', Rb);
+fprintf('Code Rate    : %.4f\n', R);
+fprintf('Bit Rate     : %.2f bits/second\n', Rb);
+fprintf('Code Bit Rate: %.2f bits/second\n', Rb_code);
 
 
 
