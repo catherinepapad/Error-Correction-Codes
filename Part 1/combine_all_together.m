@@ -7,10 +7,10 @@ clear;
 close all ; 
 
 % Simulation parameters 
-n_array = 4:6;                      % [array] Codeword length
+n_array = 4;                      % [array] Codeword length
 k = 2;                              % Message length
 SNR_db_array = 10:2:20 ;            % [array] SNR in db
-bits_per_symbol_array = 3:6 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+bits_per_symbol_array = 3 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
 D_number_of_bits_to_send_OG = 10^5 ;% Number of symbols to send
 Ts = 2*10^-6 ;                      % Symbol duration in seconds
 
