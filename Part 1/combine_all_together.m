@@ -4,9 +4,9 @@
 % To suppress warnings about unreachable code
 %#ok<*UNRCH>
 clear;
-close all ; 
+close all ;     
 
-% Simulation parameters 
+%% Simulation parameters 
 n_array = 4;                      % [array] Codeword length
 k = 2;                              % Message length
 SNR_db_array = 10:2:20 ;            % [array] SNR in db
@@ -19,7 +19,7 @@ useUnitAveragePower = true; % Set to false if you don't want unit average power
 % Set the boolean variable to control parallel/serial execution
 useParallel = false;  % Set to false for serial execution
 
-% Output parameters
+%% Output parameters
 print_all = true;
 make_plots              = print_all || false ; 
 print_code_info         = print_all || false ; 
@@ -58,7 +58,7 @@ end
 
 tic
 ticBytes(gcp('nocreate'));
-% Iterate over the differend Orders of modulations values
+%% Iterate over the differend Orders of modulations values
 for bits_per_symbol_index = bits_per_symbol_indices % 34.569885 seconds
     bits_per_symbol = bits_per_symbol_array(bits_per_symbol_index);   
 
@@ -76,7 +76,7 @@ for bits_per_symbol_index = bits_per_symbol_indices % 34.569885 seconds
     % disp(['Constalletion mean energy: ', num2str(constellation_energy)]);
         
 
-    % Iterate over the differend Codeword lengths 
+    %% Iterate over the differend Codeword lengths 
     for n_index = n_indices %29.368215 seconds
         n = n_array(n_index); 
 
@@ -85,6 +85,7 @@ for bits_per_symbol_index = bits_per_symbol_indices % 34.569885 seconds
             fprintf('Codeword length n: %.0f \n', n);
         end
         
+        %% Calculate the 'rate' of the code
         % Calculate bit duration (Tb)
         Tb = Ts / bits_per_symbol;  % [sec/bits]
         
@@ -123,6 +124,7 @@ for bits_per_symbol_index = bits_per_symbol_indices % 34.569885 seconds
         % Define the parity check matrix H
         [G , H , d_min] = createGeneratorMatrix(n,k);
 
+        %% Print information about the linear block code
         if print_code_info
             % % Display the matrix G
             % fprintf('G = \n');
@@ -149,6 +151,7 @@ for bits_per_symbol_index = bits_per_symbol_indices % 34.569885 seconds
             
         end
         
+        %% Iterate over the differend SNR values
         parfor (SNR_index = SNR_indices , Workers) % 15.939097 seconds
             SNR_db = SNR_db_array(SNR_index); 
 
@@ -156,7 +159,7 @@ for bits_per_symbol_index = bits_per_symbol_indices % 34.569885 seconds
                 fprintf('SNR: %.2f db\n', SNR_db);
             end
         
-            % ============ Start of simulation ============
+            %% ============ Start of simulation ============
             
             % Encode the message using the linear block code
             encodedMessage = encode(message_in_bits, n, k, 'linear/binary', G);
@@ -190,7 +193,7 @@ for bits_per_symbol_index = bits_per_symbol_indices % 34.569885 seconds
 
             % ============ END of simulation ============
         
-            
+            %% Plots and prints
             if make_plots
                 % Plot only the Constellation with Noise
                 figure; 
@@ -222,7 +225,7 @@ end
 tocBytes(gcp('nocreate'));
 toc
 
-% Call other scripts that make plots
+%% Call other scripts that make plots
 plot_resutls;
 if length(bits_per_symbol_array) > 1 &&  length(n_array) > 1
     BER_surf_plot;
