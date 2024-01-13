@@ -1,7 +1,7 @@
-function x = DecodeLDPC(H, y, max_iter, interactive)
-    % DecodeLDPC - Decoder for irregular LDPC codes in the binary erasure channel
+function x = decodeLDPC(H, y, max_iter, interactive)
+    % decodeLDPC - Decoder for irregular LDPC codes in the binary erasure channel
     % 
-    %   x = DecodeLDPC(H, y, max_iter, interactive) decodes the received vector y
+    %   x = decodeLDPC(H, y, max_iter, interactive) decodes the received vector y
     %   using the parity check matrix H. The decoding is done using an iterative
     %   message passing algorithm. The algorithm is stopped if either the algorithm
     %   converges or the maximum number of iterations is reached.
@@ -24,7 +24,7 @@ function x = DecodeLDPC(H, y, max_iter, interactive)
     %        0 0 0 0 0 0 1 0 1 0 1 0;
     %        0 0 0 0 0 0 0 1 0 1 0 1];
     %   y = [NaN 1 NaN 0 NaN 1 1 NaN NaN NaN NaN NaN];
-    %   x = DecodeLDPC(H, y, 10, true);
+    %   x = decodeLDPC(H, y, 10, true);
     %   % x = [0 1 0 0 0 1 1 0 1 0 1 0]
 
     % Initialization
@@ -61,10 +61,10 @@ function x = DecodeLDPC(H, y, max_iter, interactive)
     end
 
     % Final output
-    if sum(isnan(y_history(iter, :))) > 0
+    if sum(isnan(y)) > 0
         x = NaN;
     else
-        x = y_history(iter, :);
+        x = y;
     end
 end
 
