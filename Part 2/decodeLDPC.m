@@ -19,13 +19,11 @@ function x = decodeLDPC(H, y, max_iter, interactive)
     %    If decoding fails, x is NaN.
     % 
     % Example:
-    %   H = [1 0 1 0 1 0 0 0 0 0 0 0;
-    %        0 1 0 1 0 1 0 0 0 0 0 0;
-    %        0 0 0 0 0 0 1 0 1 0 1 0;
-    %        0 0 0 0 0 0 0 1 0 1 0 1];
-    %   y = [NaN 1 NaN 0 NaN 1 1 NaN NaN NaN NaN NaN];
-    %   x = decodeLDPC(H, y, 10, true);
-    %   % x = [0 1 0 0 0 1 1 0 1 0 1 0]
+    % H =  [1 1 0 0 1 0;
+    %       0 1 1 0 0 1;
+    %       1 0 0 1 0 1];
+    % y = [NaN; 1; 0; NaN; 1; 0];
+    % x = decodeLDPC(H, y, 10, true);
 
     % Initialization
     [m, n] = size(H);
@@ -100,21 +98,24 @@ function createLDPCDecodingPlot(H, y_history)
     fig = figure(1);
     clf(fig);
     
-    prevButton = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Previous', 'Position', [20 20 50 20], 'Callback', @prevCallback);
-    nextButton = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Next',    'Position', [100 20 50 20], 'Callback', @nextCallback);
+    prevButton = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Previous', 'Position', [20 20 50 20], 'Callback', @prevnextCallback);
+    nextButton = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Next',    'Position', [100 20 50 20], 'Callback', @prevnextCallback);
 
-    % Callback functions
-    function prevCallback(~,~)
-        if current_iter > 1
-            current_iter = current_iter - 1;
-            plotGraph(current_iter);
+    function prevnextCallback(t1,~)
+        if t1.String == "Previous"
+            current_iter = max(1, current_iter - 1);
+            % if current_iter > 1
+            %     current_iter = current_iter - 1;
+            %     plotGraph(current_iter);
+            % end
+        elseif t1.String == "Next"
+            current_iter = min(current_iter + 1, max_iter);
+            % if current_iter < max_iter
+            %     current_iter = current_iter + 1;
+            %     plotGraph(current_iter);
+            % end
         end
-    end
-    function nextCallback(~,~)
-        if current_iter < max_iter
-            current_iter = current_iter + 1;
-            plotGraph(current_iter);
-        end
+        plotGraph(current_iter);
     end
 
     % Initial Plot
@@ -126,7 +127,7 @@ function createLDPCDecodingPlot(H, y_history)
         % Manually calculate x-y coordinates and create the plot
         yData = [(0:n-1)/(n-1), (0:m-1)/(m-1)];
         xData = [zeros(1, n), ones(1, m)];
-        h = plot(G, 'XData', xData, 'YData', yData)
+        h = plot(G, 'XData', xData, 'YData', yData);
         title(sprintf('LDPC Decoding - Iteration %d', iter-1));
         
         % Iterate over variable nodes to add colors and line styles
