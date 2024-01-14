@@ -25,11 +25,14 @@ function x = decodeLDPC(H, y, max_iter, interactive)
     % y = [NaN; 1; 0; NaN; 1; 0];
     % x = decodeLDPC(H, y, 10, true);
 
-    arguments 
-            H               (:,:)   double      {mustBeMember(H, [0, 1])}
-            y               (:,1)   double      {}
-            max_iter        (1,1)   double      {mustBeInteger, mustBePositive}
-            interactive     (1,1)   logical  
+    arguments (Input)
+        H               (:,:)   double      {mustBeMember(H, [0, 1])}
+        y               (:,1)   double      {validate_1_0_NaN(y)}
+        max_iter        (1,1)   double      {mustBeInteger, mustBePositive}
+        interactive     (1,1)   logical  
+    end
+    arguments (Output)
+        x               (:,1)   double      {validate_1_0_NaN(x)}
     end
 
     % Initialization
@@ -76,7 +79,6 @@ end
 
 % Function to do single iteration of decoding
 function [y_next, has_updated ] = decodeIteration(H, y)
-
     arguments (Input)
             H               (:,:)   double      {mustBeMember(H, [0, 1])}
             y               (:,1)   double      {}
@@ -105,6 +107,11 @@ end
 
 
 function createLDPCDecodingPlot(H, y_history)
+    arguments
+        H               (:,:)   double      {mustBeMember(H, [0, 1])}
+        y_history       (:,:)   double      {validate_1_0_NaN(y_history)}
+    end
+
     [m, n] = size(H);
     [G, variableNodes, checkNodes] = createBipartiteGraph(H);
 
@@ -175,6 +182,10 @@ function createLDPCDecodingPlot(H, y_history)
 end
 
 function [G, variableNodes, checkNodes] = createBipartiteGraph(H)
+    arguments
+        H               (:,:)   double      {mustBeMember(H, [0, 1])}        
+    end
+
     % Create a bipartite graph from the parity check matrix H
     % Returns the graph, and the variable and check nodes' indices
     [m, n] = size(H);
@@ -190,3 +201,22 @@ function [G, variableNodes, checkNodes] = createBipartiteGraph(H)
         end
     end
 end
+
+
+
+
+
+function [] = validate_1_0_NaN(y)
+    % Check if all elements are either 0, 1, or NaN
+    mustBeMember(y(~isnan(y)), [0, 1])        
+end
+
+
+
+
+
+
+
+
+
+
