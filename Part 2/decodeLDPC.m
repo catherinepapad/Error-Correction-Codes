@@ -19,13 +19,21 @@ function x = decodeLDPC(H, y, max_iter, interactive)
     %    If decoding fails, x is NaN.
     % 
     % Example:
-    %   H = [1 0 1 0 1 0 0 0 0 0 0 0;
-    %        0 1 0 1 0 1 0 0 0 0 0 0;
-    %        0 0 0 0 0 0 1 0 1 0 1 0;
-    %        0 0 0 0 0 0 0 1 0 1 0 1];
-    %   y = [NaN 1 NaN 0 NaN 1 1 NaN NaN NaN NaN NaN];
-    %   x = decodeLDPC(H, y, 10, true);
-    %   % x = [0 1 0 0 0 1 1 0 1 0 1 0]
+    % H =  [1 1 0 0 1 0;
+    %       0 1 1 0 0 1;
+    %       1 0 0 1 0 1];
+    % y = [NaN; 1; 0; NaN; 1; 0];
+    % x = decodeLDPC(H, y, 10, true);
+
+    arguments (Input)
+        H               (:,:)   double      {mustBeMember(H, [0, 1])}
+        y               (:,1)   double      {validate_1_0_NaN(y)}
+        max_iter        (1,1)   double      {mustBeInteger, mustBePositive}
+        interactive     (1,1)   logical  
+    end
+    arguments (Output)
+        x               (:,1)   double      {validate_1_0_NaN(x)}
+    end
 
     % Initialization
     [m, n] = size(H);
@@ -71,6 +79,15 @@ end
 
 % Function to do single iteration of decoding
 function [y_next, has_updated ] = decodeIteration(H, y)
+    arguments (Input)
+            H               (:,:)   double      {mustBeMember(H, [0, 1])}
+            y               (:,1)   double      {}
+    end
+    arguments (Output)
+        y_next          (:,1)   double      {}
+        has_updated     (1,1)   logical  
+    end
+
     [m, n] = size(H);
     has_updated = false;
     y_next = y;
@@ -90,6 +107,11 @@ end
 
 
 function createLDPCDecodingPlot(H, y_history)
+    arguments
+        H               (:,:)   double      {mustBeMember(H, [0, 1])}
+        y_history       (:,:)   double      {validate_1_0_NaN(y_history)}
+    end
+
     [m, n] = size(H);
     [G, variableNodes, checkNodes] = createBipartiteGraph(H);
 
@@ -100,21 +122,24 @@ function createLDPCDecodingPlot(H, y_history)
     fig = figure(1);
     clf(fig);
     
-    prevButton = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Previous', 'Position', [20 20 50 20], 'Callback', @prevCallback);
-    nextButton = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Next',    'Position', [100 20 50 20], 'Callback', @nextCallback);
+    prevButton = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Previous', 'Position', [20 20 50 20], 'Callback', @prevnextCallback);
+    nextButton = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Next',    'Position', [100 20 50 20], 'Callback', @prevnextCallback);
 
-    % Callback functions
-    function prevCallback(~,~)
-        if current_iter > 1
-            current_iter = current_iter - 1;
-            plotGraph(current_iter);
+    function prevnextCallback(t1,~)
+        if t1.String == "Previous"
+            current_iter = max(1, current_iter - 1);
+            % if current_iter > 1
+            %     current_iter = current_iter - 1;
+            %     plotGraph(current_iter);
+            % end
+        elseif t1.String == "Next"
+            current_iter = min(current_iter + 1, max_iter);
+            % if current_iter < max_iter
+            %     current_iter = current_iter + 1;
+            %     plotGraph(current_iter);
+            % end
         end
-    end
-    function nextCallback(~,~)
-        if current_iter < max_iter
-            current_iter = current_iter + 1;
-            plotGraph(current_iter);
-        end
+        plotGraph(current_iter);
     end
 
     % Initial Plot
@@ -126,7 +151,7 @@ function createLDPCDecodingPlot(H, y_history)
         % Manually calculate x-y coordinates and create the plot
         yData = [(0:n-1)/(n-1), (0:m-1)/(m-1)];
         xData = [zeros(1, n), ones(1, m)];
-        h = plot(G, 'XData', xData, 'YData', yData)
+        h = plot(G, 'XData', xData, 'YData', yData);
         title(sprintf('LDPC Decoding - Iteration %d', iter-1));
         
         % Iterate over variable nodes to add colors and line styles
@@ -157,6 +182,10 @@ function createLDPCDecodingPlot(H, y_history)
 end
 
 function [G, variableNodes, checkNodes] = createBipartiteGraph(H)
+    arguments
+        H               (:,:)   double      {mustBeMember(H, [0, 1])}        
+    end
+
     % Create a bipartite graph from the parity check matrix H
     % Returns the graph, and the variable and check nodes' indices
     [m, n] = size(H);
@@ -172,3 +201,22 @@ function [G, variableNodes, checkNodes] = createBipartiteGraph(H)
         end
     end
 end
+
+
+
+
+
+function [] = validate_1_0_NaN(y)
+    % Check if all elements are either 0, 1, or NaN
+    mustBeMember(y(~isnan(y)), [0, 1])        
+end
+
+
+
+
+
+
+
+
+
+
