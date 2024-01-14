@@ -25,6 +25,13 @@ function x = decodeLDPC(H, y, max_iter, interactive)
     % y = [NaN; 1; 0; NaN; 1; 0];
     % x = decodeLDPC(H, y, 10, true);
 
+    arguments 
+            H               (:,:)   double      {mustBeMember(H, [0, 1])}
+            y               (:,1)   double      {}
+            max_iter        (1,1)   double      {mustBeInteger, mustBePositive}
+            interactive     (1,1)   logical  
+    end
+
     % Initialization
     [m, n] = size(H);
 
@@ -69,6 +76,16 @@ end
 
 % Function to do single iteration of decoding
 function [y_next, has_updated ] = decodeIteration(H, y)
+
+    arguments (Input)
+            H               (:,:)   double      {mustBeMember(H, [0, 1])}
+            y               (:,1)   double      {}
+    end
+    arguments (Output)
+        y_next          (:,1)   double      {}
+        has_updated     (1,1)   logical  
+    end
+
     [m, n] = size(H);
     has_updated = false;
     y_next = y;
