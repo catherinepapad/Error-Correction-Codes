@@ -31,79 +31,89 @@ function [rho_correct,lambda_correct] = optimizeLDPC(r,r_avg,l_max,epsilon,inter
     
     %% Optimization problem for finding optimal lambda(x)
     % Objective function
-    f = zeros(1,l_max-1);
-
-    for i=1:l_max-1
-      f(i) = -1/(i+1);  
-    end
+    f = arrayfun(@(x) -1/(x+1), 1:l_max-1);
     
     % Constraint 1
     Aeq = ones(1,l_max-1); 
     beq = 1;
     
-    % Constraint 3
-    [A,b] = constraint3(epsilon,symbolic_rho,l_max,interval);
 
     % Constraint 2
-    A_size = size(A);
-    for i=1:l_max-1
-        A(A_size(1)+i,i)=-1;
-        b(A_size(1)+i) = 0;
-    end
+    [A,b,x] = constraint2(epsilon,symbolic_rho,l_max,interval);
+
     
     % Additional constraint
     A_size = size(A);
     A(A_size(1)+1,1) = 1;
-    b(A_size(1)+1) = 1/(epsilon*rho_dot_1); 
+    A(end+1,1) = 1;
+    b(end+1) = 1/(epsilon*rho_dot_1); 
+    
+    
+    % Constraint 3
+    for i=1:l_max-1
+        A(end+1,i)=-1;
+        b(end+1) = 0;
+    end
+    
     
     % Bounds on decision variables
 %     lb = [];
     lb = zeros(1,l_max-1);
 %     ub = [];
+%     ub = zeros(1,l_max-1)+0.33;
     ub = ones(1,l_max-1);
+    
     
     % Solve with linprog to find polynomial lambda(x)
     lambda = linprog(f, A, b, Aeq, beq, lb, ub);
     disp('Optimal solution:');
     disp(lambda);
     
+    % For validation purposes
+    any(sum(A(1:length(x),:)*lambda ,2) > x'./epsilon,'all')
+    
     
     % Add a zero so lambda(x) starts from lambda_1
     lambda_correct = [0; lambda];
+    
+    
+   
 end
 
 
-%% FUnction for contraint No3
-function [A,b] = constraint3(epsilon,symbolic_rho,l_max,interval)
+%% FUnction for contraint No2
+function [A,b,x] = constraint2(epsilon,symbolic_rho,l_max,interval)
     % Create a symbolic variable
     syms y; 
 
-    % Split [0,1] to equal parts by interval
+    % Split (0,1) to equal parts by interval 
     x = [];
     for i=0:interval:1  
         x = [x, i];
     end
     
-    % Length of x matrix
-    length = 1/interval + 1;
+    x = linspace(0,1,1000);
+%     x = logspace(-10,0,1000);
     
-    if (length < 4)
+    if (length(x) < 3)
         error('Insufficient discretization')
     else
-        x = x(:,2:length-1);
-        length = length  - 2;
+        x = x(:,2:end-1);
     end
+    
+    % Length of x matrix
+    len = length(x);
     
     % Initialize contraint matrix A
-    A = zeros((l_max-1)*length,l_max-1);
-    b = zeros(1,(l_max-1)*length);
+    A = zeros(len,l_max-1);
+    b = zeros(1,len);
     
     % Fill A
-    for i=1:l_max-1
-            for j=1:length 
-%                 A(j+length*(i-1),i) = epsilon*(1-subs(symbolic_rho, y, 1-x(j)))^i;
-                A(j+length*(i-1),i) = (1-subs(symbolic_rho, y, 1-x(j)))^i;
-                b(j+length*(i-1)) = x(j) / epsilon;
+    for j=1:len
+            for i=1:l_max-1 
+                A(j,i) =  ( 1 - subs(symbolic_rho, y, 1-x(j)) )^i;
             end
+            b(j) = x(j) / epsilon;
     end
+    
 end

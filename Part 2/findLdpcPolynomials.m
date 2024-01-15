@@ -38,7 +38,7 @@ function [Lambda,Rho] = findLdpcPolynomials(rho,lambda,r,l_max)
         n = lcm(n, Di(i));
     end
     
-    % Finally, find the coefficients for Lmabda and Rho polynomials
+    % Finally, find the coefficients for Lambda and Rho polynomials
     Lambda = zeros(1,l_max);
     for i=1:l_max
         Lambda(i) = lambda_frac(1,i) * n / lambda_frac(2,i);
