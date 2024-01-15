@@ -1,8 +1,28 @@
-function [rho,lambda] = optimizeLDPC(r,r_avg,l_max,epsilon,interval)
+function [rho_correct,lambda] = optimizeLDPC(r,r_avg,l_max,epsilon,interval)
     % Polynomial rho(x)
     rho = zeros(1,r+1);
     rho(2) = r*(r+1-r_avg)/r_avg;
     rho(1) = (r_avg - r*(r+1-r_avg))/r_avg;
+    
+    % Create a symbolic variable
+    syms y;
+
+    % Create the symbolic polynomial using the coefficients
+    symbolic_rho = poly2sym(rho, y);
+    
+    % Flip rho(x) to have the coefficients in the correct order
+    rho_correct = flip(rho);
+    
+    % Create the derivative of rho
+    rho_dot = rho_correct(:,2:r+1);
+    
+    % rho_dot(1) = sum of all rho_dot coefficients
+    rho_dot_1 = 0;
+    
+    for i=1:r
+        rho_dot(i) = rho_dot(i)*i;
+        rho_dot_1 = rho_dot_1 + rho_dot(i);
+    end
     
     
     %% Optimization problem for finding optimal lambda(x)
@@ -18,7 +38,7 @@ function [rho,lambda] = optimizeLDPC(r,r_avg,l_max,epsilon,interval)
     beq = 1;
     
     % Constraint 3
-    [A,b] = constraint3(epsilon,rho,l_max,interval);
+    [A,b] = constraint3(epsilon,symbolic_rho,l_max,interval);
 
     % Constraint 2
     A_size = size(A);
@@ -27,24 +47,32 @@ function [rho,lambda] = optimizeLDPC(r,r_avg,l_max,epsilon,interval)
         b(A_size(1)+i) = 0;
     end
     
+    % Additional constraint
+    A_size = size(A);
+    A(A_size(1)+1,1) = 1;
+    b(A_size(1)+1) = 1/(epsilon*rho_dot_1); 
+    
     % Bounds on decision variables
 %     lb = [];
     lb = zeros(1,l_max-1);
 %     ub = [];
     ub = ones(1,l_max-1);
     
-    % Solve with linprog
+    % Solve with linprog to find polynomial lambda(x)
     lambda = linprog(f, A, b, Aeq, beq, lb, ub);
     disp('Optimal solution:');
     disp(lambda);
     
-    rho = flip(rho);
+    
     
 end
 
 
 %% FUnction for contraint No3
-function [A,b] = constraint3(epsilon,rho,l_max,interval)
+function [A,b] = constraint3(epsilon,symbolic_rho,l_max,interval)
+    % Create a symbolic variable
+    syms y; 
+
     % Split [0,1] to equal parts by interval
     x = [];
     for i=0:interval:1  
@@ -61,12 +89,6 @@ function [A,b] = constraint3(epsilon,rho,l_max,interval)
         length = length  - 2;
     end
     
-    % Create a symbolic variable
-    syms y;
-
-    % Create the symbolic polynomial using the coefficients
-    symbolic_rho = poly2sym(rho, y);
-   
     % Initialize contraint matrix A
     A = zeros((l_max-1)*length,l_max-1);
     b = zeros(1,(l_max-1)*length);
