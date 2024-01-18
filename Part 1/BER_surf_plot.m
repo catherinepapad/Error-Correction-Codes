@@ -1,7 +1,5 @@
 % Assuming you have calculated BER values and stored them in ALL_BER_with_ECC
 
-% Choose an index for the SNR value you want to plot (e.g., the first SNR in the array)
-% snr_index = 1;
 
 for snr_index = 1:length(SNR_db_array)
     

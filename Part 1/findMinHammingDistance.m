@@ -26,7 +26,7 @@ function d_min = findMinHammingDistance(A)
 
     % Input validation
     arguments (Input)
-        A           (:,:)           {mustBeInteger}
+        A           (:,:)   double  {mustBeInteger,mustBeMember(A, [0, 1])}
     end
     % Output validation
     arguments (Output)

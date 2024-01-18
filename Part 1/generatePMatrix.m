@@ -13,7 +13,7 @@ function P = generatePMatrix(n, k, options)
 %       k           - Message length (positive integer, greater than or equal to 2).
 %   options:
 %       'target_dmin' - Target minimum Hamming distance (positive integer,
-%                      default is n - k + 1).
+%                      default is n - k + 1 Singleton bound).
 %       'maxAttempts' - Maximum number of attempts to generate P (positive
 %                      integer, default is 500).
 %
@@ -90,7 +90,7 @@ function P = generatePMatrix(n, k, options)
     arguments (Input)
         n                       (1,1)   double  {mustBeInteger, mustBePositive}
         k                       (1,1)   double  {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(k,2)}
-        options.target_dmin     (1,1)   double  {mustBeInteger, mustBePositive} = n - k + 1  %getTargetDmin(n, k)
+        options.target_dmin     (1,1)   double  {mustBeInteger, mustBePositive} = n - k + 1  % Singleton bound %getTargetDmin(n, k)
         options.maxAttempts     (1,1)   double  {mustBeInteger, mustBePositive} = 500
     end
 

@@ -1,10 +1,10 @@
 % Linear Block Code Simulation
 
 
-n = 6;  % Codeword length
+n = 10;  % Codeword length
 k = 3;  % Message length
 
-error_rate = 0.02 ; % Set the error rate for the simulated communication channel
+error_rate = 0.5 ; % Set the error rate for the simulated communication channel
 
 % The 'error_rate' variable represents the probability of a bit being flipped
 % during the transmission through a simulated communication channel. In this context,
@@ -14,7 +14,7 @@ error_rate = 0.02 ; % Set the error rate for the simulated communication channel
 
 
 % Set the initial length of transmitted data
-transmitted_data_length = 10^3; 
+transmitted_data_length = 10^7; 
 
 % Adjust the length to be a multiple of 'k' 
 transmitted_data_length = transmitted_data_length + k - mod(transmitted_data_length, k);
@@ -33,7 +33,7 @@ transmitted_data_length = transmitted_data_length + k - mod(transmitted_data_len
 
 
 % Message to be encoded
-message = randi([0, 1], 1, transmited_data_length );
+message = randi([0, 1], 1, transmitted_data_length );
 
 % Encode the message using the linear block code
 encodedMessage = encode(message, n, k, 'linear/binary', G);

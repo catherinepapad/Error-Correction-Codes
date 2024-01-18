@@ -4,20 +4,23 @@
 % To suppress warnings about unreachable code
 %#ok<*UNRCH>
 clear;
-close all ; 
+close all ;     
 
-% Simulation parameters 
-n_array = 4:5;                      % Codeword length
+%% Simulation parameters 
+n_array = 4:6;                      % [array] Codeword length
 k = 2;                              % Message length
-SNR_db_array = 20 ;            % SNR in db
-bits_per_symbol_array = 3:5 ;       % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+
+SNR_db_array = 10:2:20 ;            % [array] SNR in db
+bits_per_symbol_array = 3:5 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
 D_number_of_bits_to_send = 10^4 ;   % Number of symbols to send
+
 Ts = 2*10^-6 ;                      % Symbol duration in seconds
 
 gray_encoding = true;
 useUnitAveragePower = true; % Set to false if you don't want unit average power
+% Set the boolean variable to control parallel/serial execution
+useParallel = false;  % Set to false for serial execution
 
-% Output parameters
 print_all = true;
 make_plots              = print_all || false ; 
 plot_constalletions     = print_all || false ; 
@@ -33,6 +36,12 @@ ALL_BER_non_ECC     =  zeros(length(SNR_db_array) , length(bits_per_symbol_array
 ALL_Rb_code         =  zeros(                       length(bits_per_symbol_array) ,length(n_array) ) ; 
 
 
+% Create arrays of indices for parallel execution
+bits_per_symbol_indices = 1:length(bits_per_symbol_array);
+n_indices = 1:length(n_array);
+SNR_indices = 1:length(SNR_db_array);
+
+
 % Auto generated parameters
 if gray_encoding
     symbol_encoding = 'gray';
@@ -44,6 +53,8 @@ end
 % Iterate over the differend Codeword lengths 
 for n_index = 1:length(n_array)
     n = n_array(n_index); 
+
+
 
 
     if print_current_status 
@@ -83,6 +94,7 @@ for n_index = 1:length(n_array)
     % Iterate over the differend Orders of modulations values
     for bits_per_symbol_index = 1:length(bits_per_symbol_array)
         bits_per_symbol = bits_per_symbol_array(bits_per_symbol_index);   
+
     
         if print_current_status 
             fprintf('bits per symbol: %.0f \n', bits_per_symbol);
@@ -104,6 +116,7 @@ for n_index = 1:length(n_array)
 
     
         
+        %% Calculate the 'rate' of the code
         % Calculate bit duration (Tb)
         Tb = Ts / bits_per_symbol;  % [sec/bits]
         
@@ -123,7 +136,7 @@ for n_index = 1:length(n_array)
         
         % Minimum number of bits needed to send to be able to create code words and symbols without zero padding
         D_min = k  * bits_per_symbol / gcd(n, bits_per_symbol);
-        D_number_of_bits_to_send = ceil(D_number_of_bits_to_send / D_min) * D_min;
+        D_number_of_bits_to_send = ceil(D_number_of_bits_to_send_OG / D_min) * D_min;
         
         % The purpose of the adjustment is to ensure that the length of the transmitted data
         % is a multiple of 'D_min', which is important.
@@ -140,15 +153,43 @@ for n_index = 1:length(n_array)
         
        
 
+
+        %% Print information about the linear block code
+        if print_code_info
+            % % Display the matrix G
+            % fprintf('G = \n');
+            % disp(G);
         
-        for SNR_index = 1:length(SNR_db_array)
+            % Display the matrix G
+            fprintf('G = \n');
+            disp(num2str(G, '%d')) ;
+        
+            % Add an extra empty line 
+            fprintf('\n');
+        
+            % Generate all possible binary vectors of length k
+            binary_vectors = dec2bin(0:2^k-1, k) - '0';
+        
+            % Generate all possible codewords
+            all_codewords= mod(binary_vectors*G,2) ;
+            
+            % Create a table
+            T = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
+            
+            % Display the table
+            disp(T);
+            
+        end
+        
+        %% Iterate over the differend SNR values
+        parfor (SNR_index = SNR_indices , Workers) % 15.939097 seconds
             SNR_db = SNR_db_array(SNR_index); 
 
             if print_current_status 
                 fprintf('SNR: %.2f db\n', SNR_db);
             end
         
-            % ============ Start of simulation ============
+            %% ============ Start of simulation ============
             
             % Encode the message using the linear block code
             encodedMessage = encode(message_in_bits, n, k, 'linear/binary', G);
@@ -168,8 +209,8 @@ for n_index = 1:length(n_array)
             
             % Decode the received codewords using the linear block code
             % Use the "evalc" function to capture the output from the "disp" function calls that are from the "syndtable" function that the "decode" function calls
-            uselles_output = evalc("decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);");
-            % decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
+            % uselles_output = evalc("decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);");
+            decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
             
             
             % Compare the original and demodulated symbols after ECC 
@@ -182,7 +223,7 @@ for n_index = 1:length(n_array)
 
             % ============ END of simulation ============
         
-            
+            %% Plots and prints
             if make_plots
                 % Plot only the Constellation with Noise
                 figure; 
@@ -194,10 +235,6 @@ for n_index = 1:length(n_array)
             end
             
             
-            
-            
-            
-
             if print_BER
                 disp(['BER with no ECC: '  num2str(100*BER_non_ECC) '%']);
                 disp(['BER with ECC:    '  num2str(100*BER_with_ECC) '%']);
@@ -215,7 +252,10 @@ for n_index = 1:length(n_array)
 
 end
 
-% Call other scripts that make plots
+tocBytes(gcp('nocreate'));
+toc
+
+%% Call other scripts that make plots
 plot_resutls;
 if length(bits_per_symbol_array) > 1 &&  length(n_array) > 1
     BER_surf_plot;
