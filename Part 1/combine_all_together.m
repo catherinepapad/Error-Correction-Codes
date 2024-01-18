@@ -9,7 +9,7 @@ close all ;
 % Simulation parameters 
 n_array = 4:5;                      % Codeword length
 k = 2;                              % Message length
-SNR_db_array = 10:2:20 ;            % SNR in db
+SNR_db_array = 20 ;            % SNR in db
 bits_per_symbol_array = 3:5 ;       % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
 D_number_of_bits_to_send = 10^4 ;   % Number of symbols to send
 Ts = 2*10^-6 ;                      % Symbol duration in seconds
@@ -18,8 +18,9 @@ gray_encoding = true;
 useUnitAveragePower = true; % Set to false if you don't want unit average power
 
 % Output parameters
-print_all = false;
+print_all = true;
 make_plots              = print_all || false ; 
+plot_constalletions     = print_all || false ; 
 print_code_info         = print_all || false ; 
 print_rates             = print_all || false ;
 print_BER               = print_all || false ; 
@@ -39,31 +40,69 @@ else
     symbol_encoding = 'bin'; 
 end
 
-% Iterate over the differend Orders of modulations values
-for bits_per_symbol_index = 1:length(bits_per_symbol_array)
-    bits_per_symbol = bits_per_symbol_array(bits_per_symbol_index);   
+
+% Iterate over the differend Codeword lengths 
+for n_index = 1:length(n_array)
+    n = n_array(n_index); 
+
 
     if print_current_status 
-        fprintf('bits per symbol: %.0f \n', bits_per_symbol);
+        fprintf('Codeword length n: %.0f \n', n);
     end
 
-    % Order of modulation
-    M = 2^bits_per_symbol; 
+    % Define the generator matrix G
+    % Define the parity check matrix H
+    [G , H , d_min] = createGeneratorMatrix(n,k);
 
-    % Calculate the mean energy of the constalletion
-    constellation_points = qammod(0:M-1 , M ,'UnitAveragePower', useUnitAveragePower,'PlotConstellation',make_plots); 
-    constellation_energy = mean(abs(constellation_points).^2) ; 
-    % disp(['Constalletion mean energy: ', num2str(constellation_energy)]);
+    if print_code_info
+            % % Display the matrix G
+            % fprintf('G = \n');
+            % disp(G);
         
+            % Display the matrix G
+            fprintf('G = \n');
+            disp(num2str(G, '%d')) ;
+        
+            % Add an extra empty line 
+            fprintf('\n');
+        
+            % Generate all possible binary vectors of length k
+            binary_vectors = dec2bin(0:2^k-1, k) - '0';
+        
+            % Generate all possible codewords
+            all_codewords= mod(binary_vectors*G,2) ;
+            
+            % Create a table
+            T = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
+            
+            % Display the table
+            disp(T);
+        
+    end
 
-    % Iterate over the differend Codeword lengths 
-    for n_index = 1:length(n_array)
-        n = n_array(n_index); 
-
+    % Iterate over the differend Orders of modulations values
+    for bits_per_symbol_index = 1:length(bits_per_symbol_array)
+        bits_per_symbol = bits_per_symbol_array(bits_per_symbol_index);   
     
         if print_current_status 
-            fprintf('Codeword length n: %.0f \n', n);
+            fprintf('bits per symbol: %.0f \n', bits_per_symbol);
         end
+    
+        % Order of modulation
+        M = 2^bits_per_symbol; 
+    
+        
+        % This is used to only plot the constalletion
+        if n_index == 1 
+            temp_plot_constalletions = plot_constalletions ; 
+        else
+            temp_plot_constalletions = false ; 
+        end
+        % Calculate the mean energy of the constalletion
+        constellation_points = qammod(0:M-1 , M ,'UnitAveragePower', useUnitAveragePower,'PlotConstellation',temp_plot_constalletions); 
+        % constellation_energy = mean(abs(constellation_points).^2) ;  % This is 1 when useUnitAveragePower is true            
+
+    
         
         % Calculate bit duration (Tb)
         Tb = Ts / bits_per_symbol;  % [sec/bits]
@@ -99,35 +138,8 @@ for bits_per_symbol_index = 1:length(bits_per_symbol_array)
         
         
         
-        % Define the generator matrix G
-        % Define the parity check matrix H
-        [G , H , d_min] = createGeneratorMatrix(n,k);
+       
 
-        if print_code_info
-                % % Display the matrix G
-                % fprintf('G = \n');
-                % disp(G);
-            
-                % Display the matrix G
-                fprintf('G = \n');
-                disp(num2str(G, '%d')) ;
-            
-                % Add an extra empty line 
-                fprintf('\n');
-            
-                % Generate all possible binary vectors of length k
-                binary_vectors = dec2bin(0:2^k-1, k) - '0';
-            
-                % Generate all possible codewords
-                all_codewords= mod(binary_vectors*G,2) ;
-                
-                % Create a table
-                T = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
-                
-                % Display the table
-                disp(T);
-            
-        end
         
         for SNR_index = 1:length(SNR_db_array)
             SNR_db = SNR_db_array(SNR_index); 
