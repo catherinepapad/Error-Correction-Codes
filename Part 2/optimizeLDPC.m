@@ -45,7 +45,7 @@ function [rho_correct,lambda_correct] = optimizeLDPC(r,r_avg,l_max,epsilon,inter
     % Additional constraint
     A_size = size(A);
     A(A_size(1)+1,1) = 1;
-    A(end+1,1) = 1;
+    %A(end+1,1) = 1;
     b(end+1) = 1/(epsilon*rho_dot_1); 
     
     
@@ -70,7 +70,7 @@ function [rho_correct,lambda_correct] = optimizeLDPC(r,r_avg,l_max,epsilon,inter
     disp(lambda);
     
     % For validation purposes
-    any(sum(A(1:length(x),:)*lambda ,2) > x'./epsilon,'all')
+    %any(sum(A(1:length(x),:)*lambda ,2) > x'./epsilon,'all')
     
     
     % Add a zero so lambda(x) starts from lambda_1
@@ -92,7 +92,7 @@ function [A,b,x] = constraint2(epsilon,symbolic_rho,l_max,interval)
         x = [x, i];
     end
     
-    x = linspace(0,1,1000);
+%    x = linspace(0,1,1000);
 %     x = logspace(-10,0,1000);
     
     if (length(x) < 3)
