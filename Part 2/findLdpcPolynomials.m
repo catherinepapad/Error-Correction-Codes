@@ -5,7 +5,11 @@ function [Lambda,Rho] = findLdpcPolynomials(rho, lambda, n)
     % 
     % This function uses an approximate method, as the exact method may
     % yield a very large n (codeword length).
-    
+
+    % rho(1) and lambda(1) must be 0
+    assert(rho(1) == 0);
+    assert(lambda(1) == 0);
+ 
     % turn rho and lambda into row vectors if they are not already
     if size(rho,1) > size(rho,2)
         rho = rho';
@@ -13,17 +17,18 @@ function [Lambda,Rho] = findLdpcPolynomials(rho, lambda, n)
     if size(lambda,1) > size(lambda,2)
         lambda = lambda';
     end
-    
+
+    % find last non-zero element
     r_max = find(rho,1,'last');
     l_max = find(lambda,1,'last');
 
 
-    denom = sum( lambda(1:l_max) ./ (1:l_max) );
+    denom = sum( lambda(2:l_max) ./ (2:l_max) );
     L = (lambda(1:l_max) ./ (1:l_max) / denom) * n;
     R = (rho(1:r_max) ./ (1:r_max) / denom) * n;
     L_hat = floor(L);
     R_hat = floor(R);
-    A = sum(R - R_hat);
+    A = sum(R(2:end) - R_hat(2:end));
 
 
     % Linear optimization problem for sum(x_R_hat - A) >= 0
@@ -34,7 +39,23 @@ function [Lambda,Rho] = findLdpcPolynomials(rho, lambda, n)
     %   sum(x_L_hat .* (1:l_max)) - sum( x_R_hat .* (1:r_max) ) = sum( R_hat .* (1:r_max) ) - sum( L_hat .* (1:l_max) )
     %   x_L_hat E {0,1}, x_R_hat E {0,1}
     %   sum( x_R_hat ) >= ceil(A)
-    % 
+
+    % x_L_hat(1) and x_R_hat(1) must be 0, so we exclude them from 
+    % the linear programming. We will add them back later.
+    l_len = l_max-1;
+    r_len = r_max-1;
+
+    f = [zeros(1,l_len), ones(1,r_len)];
+    A_ = [zeros(1,l_len), ones(1,r_len)];
+    b_ = ceil(A);
+    Aeq = [ones(1,l_len), zeros(1,r_len); (2:l_max), -(2:r_max)];
+    beq = [n - sum(L_hat); sum(R_hat .* (1:r_max)) - sum(L_hat .* (1:l_max))];
+    lb = zeros(1,l_len+r_len);
+    ub = ones(1,l_len+r_len);
+    intcon = 1:l_len+r_len;
+
+    x = intlinprog(f,intcon,A_,b_,Aeq,beq,lb,ub);
+
     % Linear optimization problem for sum(x_R_hat - A) <= 0
     % Variables: x_L_hat, x_R_hat (vectors of length l_max and r_max)
     % Maximize: sum(x_R_hat)
@@ -44,26 +65,19 @@ function [Lambda,Rho] = findLdpcPolynomials(rho, lambda, n)
     %   x_L_hat E {0,1}, x_R_hat E {0,1}
     %   sum( x_R_hat ) <= floor(A)
     
-    f = [zeros(1,l_max), ones(1,r_max)];
-    A_ = [zeros(1,l_max), ones(1,r_max)];
-    b_ = ceil(A);
-    Aeq = [ones(1,l_max), zeros(1,r_max); (1:l_max), -(1:r_max)];
-    beq = [n - sum(L_hat); sum(R_hat) - sum(L_hat)];
-    lb = zeros(1,l_max+r_max);
-    ub = ones(1,l_max+r_max);
-    intcon = 1:l_max+r_max;
+    % x_L_hat(1) and x_R_hat(1) must be 0, so we exclude them from 
+    % the linear programming. We will add them back later.
+    l_len = l_max-1;
+    r_len = r_max-1;
 
-    x = intlinprog(f,intcon,A_,b_,Aeq,beq,lb,ub);
-
-
-    f = -[zeros(1,l_max), ones(1,r_max)];
-    A_ = [zeros(1,l_max), ones(1,r_max)];
+    f = -[zeros(1,l_len), ones(1,r_len)];
+    A_ = [zeros(1,l_len), ones(1,r_len)];
     b_ = -floor(A);
-    Aeq = [ones(1,l_max), zeros(1,r_max); (1:l_max), -(1:r_max)];
-    beq = [n - sum(L_hat); sum(R_hat) - sum(L_hat)];
-    lb = zeros(1,l_max+r_max);
-    ub = ones(1,l_max+r_max);
-    intcon = 1:l_max+r_max;
+    Aeq = [ones(1,l_len), zeros(1,r_len); (2:l_max), -(2:r_max)];
+    beq = [n - sum(L_hat); sum(R_hat .* (1:r_max)) - sum(L_hat .* (1:l_max))];
+    lb = zeros(1,l_len+r_len);
+    ub = ones(1,l_len+r_len);
+    intcon = 1:l_len+r_len;
 
     x2 = intlinprog(f,intcon,A_,b_,Aeq,beq,lb,ub);
     
@@ -72,8 +86,10 @@ function [Lambda,Rho] = findLdpcPolynomials(rho, lambda, n)
         x = x2;
     end
 
-    Lambda = L_hat + x(1:l_max).';
-    Rho = R_hat + x(l_max+1:end).';
+    x_L_hat = [0; x(1:l_len)].';
+    x_R_hat = [0; x(l_len+1:end)].';
+    Lambda = L_hat + x_L_hat;
+    Rho = R_hat + x_R_hat;
     
 end
 
