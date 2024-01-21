@@ -68,6 +68,7 @@ for n_index = 1:length(n_array)
             % disp(G);
         
             % Display the matrix G
+            fprintf("Dmin = %d\n", d_min);
             fprintf('G = \n');
             disp(num2str(G, '%d')) ;
         
