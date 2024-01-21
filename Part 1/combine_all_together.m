@@ -9,17 +9,13 @@ close all ;
 %% Simulation parameters 
 n_array = 4:6;                      % [array] Codeword length
 k = 2;                              % Message length
-
 SNR_db_array = 10:2:20 ;            % [array] SNR in db
 bits_per_symbol_array = 3:5 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
-D_number_of_bits_to_send = 10^4 ;   % Number of symbols to send
-
+D_number_of_bits_to_send_OG = 10^4 ;   % Number of symbols to send
 Ts = 2*10^-6 ;                      % Symbol duration in seconds
 
 gray_encoding = true;
 useUnitAveragePower = true; % Set to false if you don't want unit average power
-% Set the boolean variable to control parallel/serial execution
-useParallel = false;  % Set to false for serial execution
 
 print_all = true;
 make_plots              = print_all || false ; 
@@ -49,6 +45,7 @@ else
     symbol_encoding = 'bin'; 
 end
 
+tic 
 
 % Iterate over the differend Codeword lengths 
 for n_index = 1:length(n_array)
@@ -149,40 +146,9 @@ for n_index = 1:length(n_array)
         message_in_bits = randi([0 1], D_number_of_bits_to_send, 1); % Generate random symbols
         
         
-        
-        
-       
-
-
-        %% Print information about the linear block code
-        if print_code_info
-            % % Display the matrix G
-            % fprintf('G = \n');
-            % disp(G);
-        
-            % Display the matrix G
-            fprintf('G = \n');
-            disp(num2str(G, '%d')) ;
-        
-            % Add an extra empty line 
-            fprintf('\n');
-        
-            % Generate all possible binary vectors of length k
-            binary_vectors = dec2bin(0:2^k-1, k) - '0';
-        
-            % Generate all possible codewords
-            all_codewords= mod(binary_vectors*G,2) ;
-            
-            % Create a table
-            T = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
-            
-            % Display the table
-            disp(T);
-            
-        end
-        
+                
         %% Iterate over the differend SNR values
-        parfor (SNR_index = SNR_indices , Workers) % 15.939097 seconds
+        for SNR_index = SNR_indices
             SNR_db = SNR_db_array(SNR_index); 
 
             if print_current_status 
@@ -209,8 +175,8 @@ for n_index = 1:length(n_array)
             
             % Decode the received codewords using the linear block code
             % Use the "evalc" function to capture the output from the "disp" function calls that are from the "syndtable" function that the "decode" function calls
-            % uselles_output = evalc("decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);");
-            decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
+            uselles_output = evalc("decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);");
+            % decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
             
             
             % Compare the original and demodulated symbols after ECC 
@@ -252,7 +218,6 @@ for n_index = 1:length(n_array)
 
 end
 
-tocBytes(gcp('nocreate'));
 toc
 
 %% Call other scripts that make plots
