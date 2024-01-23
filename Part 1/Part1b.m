@@ -1,32 +1,34 @@
 % Linear Block Code Simulation
 
+% To suppress warnings about unreachable code
+%#ok<*UNRCH>
 
-k = 4;  % Message length
-n_arr = 2 * (5:1:10);  % Codeword length
-
-% p1 = 0.1 ; % Set the error rate for the simulated communication channel 1
-% p2 = 0.2 ; % Set the error rate for the simulated communication channel 2
+k = 2;          % Message length
+n_arr = 5:10;  % Codeword length
 
 p_arr = logspace(-5,log10(0.5),15);
-% repmat(0.1, length(n_arr),1); % [0.1 0.1 0.1 0.1 ] ; 
+% repmat(0.1, length(n_arr),1); 
 
 % The 'p' variable represents the probability of a bit being flipped
 % during the transmission through a simulated communication channel. In this context,
-% it is assumed that 2% of the transmitted bits will be affected by errors.
+% it is assumed that (100*p)% of the transmitted bits will be affected by errors.
 % This variable is used in simulations to model the noise or errors introduced
-% during data transmission and is typically employed in error analysis or testing scenarios.
-
-
-
-rate = 10^-6 ; %[sec/bit]
-T_ack = 1 ; %logspace(-3 , 6 , 6);
-
-block_error_rate = zeros(length(n_arr) , length(p_arr)  ) ; 
-
-print_code_info = false;
+% during data transmission.
 
 % Set the initial length of transmitted data
 transmitted_data_length = 10^6; 
+rate = 10^-6 ; %[sec/bit]  The speed of the comunication channel
+T_ack_arr = logspace(-3 , 6 , 6); % [sec]
+
+% Printing parameters
+print_code_info = false;
+print_progress = false;
+
+
+% Array to store results
+block_error_rate = zeros(length(n_arr) , length(p_arr)  ) ; 
+
+
 
 % Adjust the length to be a multiple of 'k' 
 transmitted_data_length = transmitted_data_length + k - mod(transmitted_data_length, k);
@@ -43,38 +45,33 @@ transmitted_data_length = transmitted_data_length + k - mod(transmitted_data_len
 for i = 1:length(n_arr)
     n = n_arr(i);
 
-     % Define the generator matrix G
+    % Define the generator matrix G
     % Define the parity check matrix H
     [G , H , d_min] = createGeneratorMatrix(n,k);
     
     
-    fprintf("Dmin = %d\n", d_min);
+    if print_code_info
+            % Display the matrix G
+            fprintf('G = \n');
+            disp(num2str(G, '%d')) ;
 
-    % if print_code_info
-    %         % % Display the matrix G
-    %         % fprintf('G = \n');
-    %         % disp(G);
-    % 
-    %         % Display the matrix G
-    %         fprintf('G = \n');
-    %         disp(num2str(G, '%d')) ;
-    % 
-    %         % Add an extra empty line 
-    %         fprintf('\n');
-    % 
-    %         % Generate all possible binary vectors of length k
-    %         binary_vectors = dec2bin(0:2^k-1, k) - '0';
-    % 
-    %         % Generate all possible codewords
-    %         all_codewords= mod(binary_vectors*G,2) ;
-    % 
-    %         % Create a table
-    %         T = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
-    % 
-    %         % Display the table
-    %         disp(T);
-    % 
-    % end
+            % Add an extra empty line 
+            fprintf('\n');
+
+            fprintf("dmin = %d\n\n", d_min);
+
+            % Generate all possible binary vectors of length k
+            binary_vectors = dec2bin(0:2^k-1, k) - '0';
+
+            % Generate all possible codewords
+            all_codewords= mod(binary_vectors*G,2) ;
+
+            % Create a table
+            T = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
+
+            % Display the table
+            disp(T);
+    end
  
     % Message to be encoded
     message = randi([0, 1], 1, transmitted_data_length );
@@ -85,18 +82,13 @@ for i = 1:length(n_arr)
     for j = 1:length(p_arr)
         p = p_arr(j);
 
-       
+        % Copy the original message 
+        encodedMessage = encodedMessage_og ;  
         
-       encodedMessage = encodedMessage_og ; 
-        
-        
-        
-        % Change random bits with a 'error_rate' probability
+        % Choose random bits with a 'error_rate' probability
         noise_index = rand(size(encodedMessage)) < p;
         percentage_of_changed_bits = sum(noise_index) / length(encodedMessage);
         
-        % Display the percentage of bits changed
-        fprintf('Percentage of bits changed: %.2f%%\n', percentage_of_changed_bits * 100);
         
         % Invert the bits at the selected noise_index
         encodedMessage(noise_index) = ~encodedMessage(noise_index);
@@ -111,92 +103,84 @@ for i = 1:length(n_arr)
         % Compare the original and demodulated symbols
         [~,BER_with_ECC] = biterr(message,decodedMessage) ;
     
-    
-    
-        fprintf("n %d  p %.3f \n" , n , p );
-        disp(['BER_with_ECC: '  num2str(100*BER_with_ECC) '%']);
-    
-
+        
+        % Calculate BLER (Block Error Rate) the probability that there will an error in a block    
         b = any(reshape(message ~= decodedMessage , [],k),2);
-
-        block_ER = sum(b) / length(b);
-    
-        disp(['block_BER_with_ECC: '  num2str(100*block_ER) '%']);
-
-            
-        block_error_rate(i,j) = block_ER ; 
-    
-        % disp(['ratio: '  num2str(block_BER/BER) ]);
-    
+        BLER = sum(b) / length(b);
     
         
+
+        % Store results
+        block_error_rate(i,j) = BLER ; 
+    
+        if print_progress
+            fprintf("n %d  p %.3f \n" , n , p );        
+            fprintf('Percentage of bits changed: %.2f%%\n', percentage_of_changed_bits * 100);        
+            disp(['BER_with_ECC: '  num2str(100*BER_with_ECC) '%']);
+            disp(['block_BER_with_ECC: '  num2str(100*BLER) '%']);
+        
+            % disp(['ratio BLER/BER_with_ECC: '  num2str(block_BER/BER_with_ECC) ]);
+        end
+
     end
 end
 
 
+%% BLER
 
 figure ; 
 plot(n_arr , flip(block_error_rate,2) ,Marker="+" , LineWidth=1);
 leg = legend(arrayfun(@num2str,flip(p_arr),'UniformOutput',false),Location="best");
-title(leg,'p')
+title(leg,'p');
 xticks(n_arr);
 set(gca, 'YScale', 'log');
 ylabel("BLER");
-xlabel("n")
-grid on
+xlabel("n");
+grid on;
 title(sprintf("Block Error Rate k=%d" ,k));
 
 
 
+%% E(T|n) no T_ack ( T_ack = 0 ) 
 
-figure; 
-
-
-% T_ack = 100;
 meanX = 1./(1-block_error_rate) ;
 
 T_simple = rate * ( repmat(n_arr' , 1, length(p_arr)) .* meanX );
-T_with_ack= rate * ( repmat(n_arr' , 1, length(p_arr)) .* meanX ) + T_ack * (meanX-1);
 
-% T = (n*rate)*meanX + T_ack * (meanX-1) ;
-% fprintf("E(T) = %.9f \n\n" , T);
-% 
-
+figure; 
 plot(n_arr , flip(T_simple,2) ,Marker="+" , LineWidth=1);
 leg = legend(arrayfun(@num2str,flip(p_arr),'UniformOutput',false),Location="best");
-% hold on ; 
-% plot(n_arr , flip(T_with_ack,2) ,Marker="o" , LineWidth=1);
-% leg = legend(arrayfun(@num2str,flip(p_arr),'UniformOutput',false),Location="best");
 
-title(leg,'p')
+title(leg,'p');
 xticks(n_arr);
 set(gca, 'YScale', 'log');
 ylabel("E(T|n)");
-xlabel("n")
-grid on
-
-
+xlabel("n");
+grid on;
 title(sprintf("E(T|n)  k=%d  " ,k ));
 
 
+%% E(T|n) with T_ack
 
-figure; 
-% plot(n_arr , flip(T_simple,2) ,Marker="+" , LineWidth=1);
-% leg = legend(arrayfun(@num2str,flip(p_arr),'UniformOutput',false),Location="best");
-% % hold on ; 
-plot(n_arr , flip(T_with_ack,2) ,Marker="o" , LineWidth=1);
-leg = legend(arrayfun(@num2str,flip(p_arr),'UniformOutput',false),Location="best");
+for T_ack = T_ack_arr
 
-title(leg,'p')
-xticks(n_arr);
-set(gca, 'YScale', 'log');
-ylabel("E(T|n)");
-xlabel("n")
-grid on
-
-
-title(sprintf("E(T|n)  k=%d  T_ack = %f" ,k , T_ack));
-
+    % T = (n*rate)*meanX + T_ack * (meanX-1) ;
+    T_with_ack= rate * ( repmat(n_arr' , 1, length(p_arr)) .* meanX ) + T_ack * (meanX-1);
+    
+    
+    figure; 
+    
+    plot(n_arr , flip(T_with_ack,2) ,Marker="o" , LineWidth=1);
+    leg = legend(arrayfun(@(x) num2str(x, "%.3g"),p_arr ,'UniformOutput',false),Location="best");
+    
+    title(leg,'p');
+    xticks(n_arr);
+    set(gca, 'YScale', 'log');
+    ylabel("E(T|n)");
+    xlabel("n");
+    grid on;
+    title(sprintf("E(T|n) k=%d  T_{ack} = %2.2g" ,k , T_ack));
+end
 
 
 
