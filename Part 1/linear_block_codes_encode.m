@@ -1,5 +1,5 @@
 % Linear Block Code Simulation
-
+% Example usage
 
 n = 10;  % Codeword length
 k = 3;  % Message length

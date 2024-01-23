@@ -43,7 +43,7 @@ transmitted_data_length = transmitted_data_length + k - mod(transmitted_data_len
 % the initially specified length.
 
 
-
+tic
 for i = 1:length(n_arr)
     n = n_arr(i);
 
@@ -126,7 +126,7 @@ for i = 1:length(n_arr)
 
     end
 end
-
+toc
 
 %% BLER
 
