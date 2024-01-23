@@ -121,7 +121,7 @@ for i = 1:length(n_arr)
             disp(['BER_with_ECC: '  num2str(100*BER_with_ECC) '%']);
             disp(['block_BER_with_ECC: '  num2str(100*BLER) '%']);
         
-            % disp(['ratio BLER/BER_with_ECC: '  num2str(block_BER/BER_with_ECC) ]);
+            % disp(['ratio BLER/BER_with_ECC: '  num2str(BLER/BER_with_ECC) ]);
         end
 
     end
