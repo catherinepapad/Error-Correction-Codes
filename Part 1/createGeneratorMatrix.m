@@ -39,6 +39,10 @@ function [G , H , d_min] = createGeneratorMatrix(n,k, options)
         d_min                   (1,1)   double  {mustBeInteger, mustBePositive} 
     end
 
+    if ( n < k )
+        error("n should be larger than k");
+    end
+
     % Generate systematic generator matrix G with a large minimum Hamming distance
     
     I_k = eye(k); % Identity matrix of size k
@@ -60,5 +64,7 @@ function [G , H , d_min] = createGeneratorMatrix(n,k, options)
 
     % Calculate the minimum Hamming distance of the generated code
     d_min = findMinHammingDistance(all_codewords);
+
+    % pdist(all_codewords, 'hamming') * size(all_codewords, 2)
 
 end

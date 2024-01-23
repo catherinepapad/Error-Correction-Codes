@@ -99,11 +99,16 @@ function P = generatePMatrix(n, k, options)
         P                       (:,:)   double  {mustBeMember(P, [0, 1])} 
     end
 
+    if ( n < k )
+        error("n should be larger than k");
+    end
+
     % If n==k then the code is just I_k and thus P is empty 
     if (n == k)
         P = [];
         return;
     end    
+
     
     
     bestP = [];
