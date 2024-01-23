@@ -1,5 +1,13 @@
 % Example: Generating a Systematic Generator Matrix with a Large Minimum Hamming Distance
 
+% Assuming you are in the Subfolder
+parentFolder = fileparts(pwd);  % Get the path of the parent folder
+
+% Add the AnotherFolder to the path temporarily
+% addpath(fullfile(parentFolder, 'AnotherFolder'));
+addpath(parentFolder);
+
+
 % Define parameters
 n = 8; % Codeword length
 k = 4; % Message length
@@ -41,3 +49,8 @@ disp(['Minimum Hamming Distance (d_min): ' num2str(d_min)]);
 % Additional information
 disp('Note: The code is generated to maximize the minimum Hamming distance.');
 disp('The function uses a randomized approach with a default maximum number of attempts (500).');
+
+
+% Remove the AnotherFolder from the path to avoid clutter
+rmpath(parentFolder);
+

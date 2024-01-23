@@ -1,16 +1,17 @@
 % Parameters
 close all ; 
-SNR_db = 15 ;           % SNR in db
+SNR_db = 17 ;           % SNR in db
 symbols_send = 10^5 ;   % Number of symbols to send
 bits_per_symbol = 4 ;   % Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
 M = 2^bits_per_symbol;  % Order of modulation (e.g., 16 for 16-QAM)
 
-make_plots = false ; 
+% Modulation
+useUnitAveragePower = false; % Set to false if you don't want unit average power
+
+make_plots = true ; 
 
 symbols = randi([0 M-1], symbols_send, 1); % Generate random symbols
 
-% Modulation
-useUnitAveragePower = true; % Set to false if you don't want unit average power
 
 % Calculate the mean energy of the constalletion
 constellation_points = qammod(0:M-1 , M ,'UnitAveragePower', useUnitAveragePower,'PlotConstellation',make_plots); 
