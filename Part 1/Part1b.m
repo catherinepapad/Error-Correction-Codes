@@ -1,4 +1,6 @@
 % Linear Block Code Simulation
+% For differend Codeword lengths and p (error probabilities)
+% with BLER and E(T|n) plots
 
 % To suppress warnings about unreachable code
 %#ok<*UNRCH>
@@ -9,9 +11,9 @@ n_arr = 5:10;  % Codeword length
 p_arr = logspace(-5,log10(0.5),15);
 % repmat(0.1, length(n_arr),1); 
 
-% The 'p' variable represents the probability of a bit being flipped
+% The 'p_arr' variable represents the probability of a bit being flipped
 % during the transmission through a simulated communication channel. In this context,
-% it is assumed that (100*p)% of the transmitted bits will be affected by errors.
+% it is assumed that (100*p(i))% of the transmitted bits will be affected by errors.
 % This variable is used in simulations to model the noise or errors introduced
 % during data transmission.
 
@@ -142,6 +144,7 @@ title(sprintf("Block Error Rate k=%d" ,k));
 
 
 %% E(T|n) no T_ack ( T_ack = 0 ) 
+% Expected transmission time per block
 
 meanX = 1./(1-block_error_rate) ;
 
@@ -154,18 +157,20 @@ leg = legend(arrayfun(@num2str,flip(p_arr),'UniformOutput',false),Location="best
 title(leg,'p');
 xticks(n_arr);
 set(gca, 'YScale', 'log');
-ylabel("E(T|n)");
+ylabel("E(T|n) [sec]");
 xlabel("n");
 grid on;
 title(sprintf("E(T|n)  k=%d  " ,k ));
 
 
 %% E(T|n) with T_ack
+% Expected transmission time per block
 
 for T_ack = T_ack_arr
 
-    % T = (n*rate)*meanX + T_ack * (meanX-1) ;
+    % Only when there is an error we "pay" an extra cost due to communication delays (transmition and propagation)
     T_with_ack= rate * ( repmat(n_arr' , 1, length(p_arr)) .* meanX ) + T_ack * (meanX-1);
+    % T = (n*rate)*meanX + T_ack * (meanX-1) ;
     
     
     figure; 
@@ -176,7 +181,7 @@ for T_ack = T_ack_arr
     title(leg,'p');
     xticks(n_arr);
     set(gca, 'YScale', 'log');
-    ylabel("E(T|n)");
+    ylabel("E(T|n) [sec]");
     xlabel("n");
     grid on;
     title(sprintf("E(T|n) k=%d  T_{ack} = %2.2g" ,k , T_ack));
