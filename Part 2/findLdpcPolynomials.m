@@ -82,8 +82,20 @@ function [Lambda,Rho] = findLdpcPolynomials(rho, lambda, n)
     x2 = intlinprog(f,intcon,A_,b_,Aeq,beq,lb,ub);
     
     % One of them should have returned a solution
-    if sum(x) == 0
+    if size(x,1) == 0 && size(x2,1) == 0
+        error('No solution found');
+    end
+
+    % If only one of them returned a solution, use that one
+    if size(x,1) == 0
         x = x2;
+    elseif size(x2,1) == 0
+        % do nothing
+    else
+        % If both returned a solution, use one closer to A (rate is closest to what we want)
+        if sum(x - A)^2 < sum(x2 - A)^2
+            x = x2;
+        end
     end
 
     x_L_hat = [0; x(1:l_len)].';
