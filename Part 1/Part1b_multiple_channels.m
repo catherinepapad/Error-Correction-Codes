@@ -1,4 +1,4 @@
-% Multipule Channels
+% Multiple Channels
 
 channels = 4 ; 
 desired_BER = 10^-2 ;
