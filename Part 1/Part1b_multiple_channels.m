@@ -1,4 +1,10 @@
 % Multiple Channels
+% For each channel find the Codeword length [n] to achive the desired [BER] (after the ECC) 
+% with the Linear Block Code for a given Message length [k] and
+% probability of a bit being flipped [p]
+% Then find the rate of each code/channel to decide what portion of the
+% information will be sent through that channel 
+
 
 channels = 4 ; 
 desired_BER = 10^-2 ;
@@ -9,16 +15,14 @@ p_arr =  linspace(0.002,0.05,channels);
                                                                             ,UniformOutput =false);
 
 
-
 % Calculate code rate (R) for each channel
 R = k_arr ./ cell2mat (n_cell_arr);
 
-% Find percentage of info to send throgh each channel
+% Find percentage of info to send through each channel
 data_portion = R / sum(R);
 
 
-
-
+%% Print results
 % Create a table
 result_table = table((1:channels)', k_arr', cell2mat(n_cell_arr)', p_arr', cell2mat(dmin_cell_arr)', R', data_portion', ...
     'VariableNames', {'Channel','k','n', 'p', 'dmin', 'R', 'Data_Portion'});
@@ -26,3 +30,20 @@ result_table = table((1:channels)', k_arr', cell2mat(n_cell_arr)', p_arr', cell2
 
 fprintf("\n\nDesired BER %g \n\n" , desired_BER);
 disp(result_table);
+
+
+
+% Create a pie plot
+figure;
+pie(data_portion);
+% Add a legend
+l = legend((arrayfun(@int2str, 1:channels,UniformOutput =false)), 'Location', 'Best'); 
+title(l,"Channel")
+title('Percentage of data to send through each channel');
+
+
+
+
+
+
+
