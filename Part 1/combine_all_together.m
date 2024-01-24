@@ -7,19 +7,21 @@ clear;
 close all ;     
 
 %% Simulation parameters 
-n_array = 4:6;                      % [array] Codeword length
+n_array = 4:7;                      % [array] Codeword length
 k = 2;                              % Message length
-SNR_db_array = 10:2:20 ;            % [array] SNR in db
-bits_per_symbol_array = 3:5 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+SNR_db_array = 20 ;                 % [array] SNR in db
+bits_per_symbol_array = 4:9 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
 D_number_of_bits_to_send_OG = 10^4 ;   % Number of symbols to send
 Ts = 2*10^-6 ;                      % Symbol duration in seconds
 
 gray_encoding = true;
 useUnitAveragePower = true; % Set to false if you don't want unit average power
 
-print_all = true;
-make_plots              = print_all || false ; 
+print_all = false;
+plots_noisy_symbols     = print_all || false ;    
 plot_constalletions     = print_all || false ; 
+plots_symbol_hist       = print_all || true ;
+plot_final_results      = print_all || false ; 
 print_code_info         = print_all || false ; 
 print_rates             = print_all || false ;
 print_BER               = print_all || false ; 
@@ -145,7 +147,7 @@ for n_index = 1:length(n_array)
         
         % The information we want to send in bits
         message_in_bits = randi([0 1], D_number_of_bits_to_send, 1); % Generate random symbols
-        
+
         
                 
         %% Iterate over the differend SNR values
@@ -191,8 +193,8 @@ for n_index = 1:length(n_array)
             % ============ END of simulation ============
         
             %% Plots and prints
-            if make_plots
-                % Plot only the Constellation with Noise
+            % Plot only the Constellation with Noise
+            if plots_noisy_symbols
                 figure; 
                 plot(real(noisy_symbols), imag(noisy_symbols), 'ro'); % Constellation with noise
                 hold on ;
@@ -201,6 +203,18 @@ for n_index = 1:length(n_array)
                 title( sprintf('Noisy %s-coded %d QAM constellation SNR: %.2f db Codeword length: %d',symbol_encoding, M, SNR_db,n) );
             end
             
+            % Histogram 
+            if plots_symbol_hist && SNR_index == 1
+                figure;
+                % Set the edges to cover integers from 0 to M-1
+                edges = -0.5:1:(M - 0.5);
+                symbols_ids = bit2int(reshape(encodedMessage, bits_per_symbol ,[] ),bits_per_symbol ) ; 
+                histogram(symbols_ids,edges ,Normalization="probability");
+                xticks(0:M-1);
+                ylabel("Percentage of symbols");
+                xlabel("Symbol id");
+                title(sprintf("Percentages for each symbol k=%d  n=%d  bps=%d (M=%d) Total symbols = %d " ,k ,n, bits_per_symbol,M,length(encodedMessage)/bits_per_symbol));
+            end
             
             if print_BER
                 disp(['BER with no ECC: '  num2str(100*BER_non_ECC) '%']);
@@ -222,8 +236,9 @@ end
 toc
 
 %% Call other scripts that make plots
-plot_resutls;
-if length(bits_per_symbol_array) > 1 &&  length(n_array) > 1
-    BER_surf_plot;
+if plot_final_results
+    plot_resutls;
+    if length(bits_per_symbol_array) > 1 &&  length(n_array) > 1
+        BER_surf_plot;
+    end
 end
-
