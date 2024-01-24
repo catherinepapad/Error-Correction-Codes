@@ -44,8 +44,8 @@ function [H, G] = createLdpcFromPoly(lambda_poly, rho_poly)
     end
 
     % The amount of edges described by the polynomials must be equal
-    n_lambda = sum(lambda_poly .* (0:length(lambda_poly)-1).' );
-    n_rho = sum(rho_poly .* (0:length(rho_poly)-1).' );
+    n_lambda = sum(lambda_poly .* (1:length(lambda_poly)).' );
+    n_rho = sum(rho_poly .* (1:length(rho_poly)).' );
     if n_lambda ~= n_rho
         error('The amount of edges described by the polynomials must be equal');
     end
@@ -70,9 +70,9 @@ function [H, G] = createLdpcFromPoly(lambda_poly, rho_poly)
         % and 'degree' be the degree of x^i in the polynomial
         % Then create 'coeff' nodes with degree 'degree'
         coeff = lambda_poly(i);
-        degree = i - 1;
+        degree = i;
         for j = 1:coeff
-            l_pool = [l_pool, repmat(l_idx, 1, degree)]  
+            l_pool = [l_pool, repmat(l_idx, 1, degree)];
             l_idx = l_idx + 1;
         end
     end
@@ -85,9 +85,9 @@ function [H, G] = createLdpcFromPoly(lambda_poly, rho_poly)
         % and 'degree' be the degree of x^i in the polynomial
         % Then create 'coeff' nodes with degree 'degree'
         coeff = rho_poly(i);
-        degree = i - 1;
+        degree = i;
         for j = 1:coeff
-            r_pool = [r_pool, repmat(r_idx, 1, degree)]
+            r_pool = [r_pool, repmat(r_idx, 1, degree)];
             r_idx = r_idx + 1;
         end
     end
@@ -102,8 +102,28 @@ function [H, G] = createLdpcFromPoly(lambda_poly, rho_poly)
     % Iterate over the edges, and increment the corresponding entry in H
     % This will make H a adjacency matrix of the Tanner graph, where H(x,y) 
     % indicates the amount of edges connecting variable node x to check node y
+    duplicate_list = [];
     for i = 1:num_edges
-        H(r_pool(i), l_pool(i)) = H(r_pool(i), l_pool(i)) + 1;
+        % If the edge already exists, add it to the duplicate list
+        if H(r_pool(i), l_pool(i)) == 1
+            duplicate_list = [duplicate_list, [r_pool(i); l_pool(i)]];
+        else % Otherwise, increment the corresponding entry in H
+            H(r_pool(i), l_pool(i)) = 1;
+        end
+    end
+
+    if(size(duplicate_list, 2) > 0)
+        fprintf('Duplicates found: %d\n', size(duplicate_list, 2));
+        % For the duplicates, first shuffle the list so that nodes are connected randomly
+        % (just rotating the check node indices by 1 will work), and then add to H
+        duplicate_list(1, :) = circshift(duplicate_list(1, :), 1);
+    
+        for i = 1:size(duplicate_list, 2)
+            H(duplicate_list(1, i), duplicate_list(2, i)) = H(duplicate_list(1, i), duplicate_list(2, i)) + 1;
+        end
+
+        % Print how many duplicates there are in H (hopefully 0)
+        fprintf('Duplicates dropped from %d to %d\n',  size(duplicate_list, 2), sum(sum(H > 1)));
     end
 
     % display(H);
