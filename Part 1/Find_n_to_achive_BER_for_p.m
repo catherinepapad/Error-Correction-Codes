@@ -1,5 +1,30 @@
-function [n, BER_with_ECC, percentage_of_changed_bits,G,H,dmin] = Find_n_to_achive_BER_for_p( k, p, BER_Threshold,options)
-% Description
+function [n, BER_with_ECC, percentage_of_changed_bits,G,H,dmin] = Find_n_to_achive_BER_for_p( k, p, BER_Threshold,options)% 
+% This MATLAB function is designed to find the minimum block length n needed to achieve a target Bit Error Rate (BER) for a Linear Block Code.
+% 
+%   Parameters:
+%       k: Message length (number of information bits).
+%       p: Probability of bit error in the channel.
+%       BER_Threshold: Target Bit Error Rate.
+%   options:
+%       'n_min' - Minimum block length (positive integer, default is k + 1).
+%       'n_max' - Maximum block length (positive integer, default is 23).
+%       'transmitted_data_length' - Length of transmitted data (positive integer, default is 10/BER_Threshold).
+%       'print_code_info' - Flag for printing code information (logical, default is false).
+%       'print_progress' - Flag for printing progress information (logical, default is false).
+% 
+% 
+% The output includes:
+% 
+%     n: Block length.
+%     BER_with_ECC: Achieved Bit Error Rate with error correction coding.
+%     percentage_of_changed_bits: Percentage of bits changed in the channel during simulations.
+%     G: Generator matrix of the linear block code.
+%     H: Parity-check matrix of the linear block code.
+%     dmin: Minimum distance of the linear block code.
+% 
+%   See also:
+%       createGeneratorMatrix, encode, decode
+
 
 
     % Input validation
