@@ -11,6 +11,7 @@ desired_BER = 10^-2 ;
 k_arr = repmat(2, 1, channels ) ;
 p_arr =  linspace(0.002,0.05,channels);
 
+% Find optimal 
 [n_cell_arr, ~, ~, G_cell_arr, ~, dmin_cell_arr] = arrayfun(@(x) Find_n_to_achive_BER_for_p(k_arr(x), p_arr(x), desired_BER),1:channels ...
                                                                             ,UniformOutput =false);
 
@@ -33,7 +34,7 @@ disp(result_table);
 
 
 
-% Create a pie plot
+%% Create a pie plot
 figure;
 pie(data_portion);
 % Add a legend
