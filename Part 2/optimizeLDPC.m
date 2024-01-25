@@ -1,8 +1,10 @@
-function [rho_correct,lambda_correct] = optimizeLDPC(r,r_avg,l_max,epsilon,interval)
+function [rho_correct,lambda_correct] = optimizeLDPC(r_avg,l_max,epsilon,interval)
     % rho_correct starts from rho_1 
     % lambda starts from lambda_1
     % coefficient with index 1 corresponds to x^0
-
+    
+    r = floor(r_avg);
+    
     % Polynomial rho(x)
     rho = zeros(1,r+1);
     rho(2) = r*(r+1-r_avg)/r_avg;
