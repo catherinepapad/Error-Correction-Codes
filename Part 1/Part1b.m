@@ -6,7 +6,7 @@
 %#ok<*UNRCH>
 
 k = 2;          % Message length
-n_arr = 5:10;  % Codeword length
+n_arr = 5:6;  % Codeword length
 
 p_arr = logspace(-5,log10(0.5),15);
 % repmat(0.1, length(n_arr),1); 
@@ -173,8 +173,7 @@ for T_ack = T_ack_arr
     % T = (n*rate)*meanX + T_ack * (meanX-1) ;
     
     
-    figure; 
-    
+    figure;     
     plot(n_arr , flip(T_with_ack,2) ,Marker="o" , LineWidth=1);
     leg = legend(arrayfun(@(x) num2str(x, "%.3g"),p_arr ,'UniformOutput',false),Location="best");
     

@@ -7,7 +7,7 @@ function [max_likelihood] = decode_table_multi_p(G,p)
     end
 
     [k, n] = size(G) ; 
-    max_likelihood = zeros(1,2^n);
+    max_likelihood = cell(1,2^n);
 
     % Generate all possible binary vectors of length k
     binary_vectors_k = dec2bin(0:2^k-1, k) - '0';
@@ -17,31 +17,39 @@ function [max_likelihood] = decode_table_multi_p(G,p)
     % binary_vectors_n = dec2bin(0:2^n-1, n) - '0'
 
     prob = zeros(1,2^k);
-    for i = 1:2^n
-        received_codeword = dec2bin(i-1, n) - '0' ;
+    for j = 1:2^n
+        received_codeword = dec2bin(j-1, n) - '0' ;
 
-        for j = 1:2^k
-            decode_to_this = all_codewords(j,:);
-
+        for i = 1:2^k
+            decode_to_this = all_codewords(i,:);
+            % Find changed bits
             mask = received_codeword ~= decode_to_this;
 
-
-            prob(j) = prod( mask .* p + (~mask) .* (1-p) );
-            % prob(j)
+            prob(i) = prod( mask .* p + (~mask) .* (1-p) );
 
         end
 
-        [~ , max_likelihood(i)] = max(prob) ;
-        % with_prob
-        % max_likelihood(i)
+        % p(r_j) = sum(prob) / (2^k)
+        % p(t_i) = 1  / (2^k)
+        % p(r_i | t_i) = prob(i) 
+        % p(t_i | r_i) = p(r_i | t_i) * p(t_i) / p(r_j)
+        %               = prob(i) / sum(prob)
+
+        % argmax_i ( p(t_i | r_i) ) = argmax_i ( prob(i) )   
+
+        % p_ti_rj = prob / sum(prob) 
+        % [~ , max_likelihood(j)] = max( prob ) ;
+
+        temp = max( prob ) ;
+
+        max_likelihood(j) = {find(prob==temp)};
+
+
 
     end
 
-    
-    % max_likelihood = 3 ;
-    
+        
 
 end
 
-%   decode_table_multi_p(G,rand(1,size(G,2))); 
-%   decode_table_multi_p(G,repmat(0.01,1,size(G,2))); 
+

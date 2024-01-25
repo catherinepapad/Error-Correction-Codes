@@ -6,13 +6,14 @@
 % information will be sent through that channel 
 
 
-channels = 4 ; 
+channels = 10 ; 
 desired_BER = 10^-2 ;
 k_arr = repmat(2, 1, channels ) ;
 p_arr =  linspace(0.002,0.05,channels);
+% p_arr =   repmat(0.01, 1, channels ) ;
 
 % Find optimal 
-[n_cell_arr, ~, ~, G_cell_arr, ~, dmin_cell_arr] = arrayfun(@(x) Find_n_to_achive_BER_for_p(k_arr(x), p_arr(x), desired_BER),1:channels ...
+[n_cell_arr, BER_with_ECC_cell_arr, ~, G_cell_arr, ~, dmin_cell_arr] = arrayfun(@(x) Find_n_to_achive_BER_for_p(k_arr(x), p_arr(x), desired_BER),1:channels ...
                                                                             ,UniformOutput =false);
 
 
@@ -25,8 +26,8 @@ data_portion = R / sum(R);
 
 %% Print results
 % Create a table
-result_table = table((1:channels)', k_arr', cell2mat(n_cell_arr)', p_arr', cell2mat(dmin_cell_arr)', R', data_portion', ...
-    'VariableNames', {'Channel','k','n', 'p', 'dmin', 'R', 'Data_Portion'});
+result_table = table((1:channels)', k_arr', cell2mat(n_cell_arr)', p_arr', cell2mat(dmin_cell_arr)', R', data_portion', cell2mat(BER_with_ECC_cell_arr)', ...
+    'VariableNames', {'Channel','k','n', 'p', 'dmin', 'R', 'Data_Portion','BER with ECC'});
 
 
 fprintf("\n\nDesired BER %g \n\n" , desired_BER);

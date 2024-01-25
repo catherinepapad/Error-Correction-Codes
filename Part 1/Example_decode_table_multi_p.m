@@ -1,7 +1,7 @@
 
 
 k = 2 ;
-n = 4 ; 
+n = 10 ; 
 [G,~,dmin] = createGeneratorMatrix(n,k);
 
 
@@ -12,12 +12,20 @@ all_codewords = mod(binary_vectors_k*G,2) ;
 
 
 p = rand(1,n) / 3 ;  %
-p = repmat(0.01,1,n) ;
+% p = repmat(0.02,1,n) 
+% p = [0.5 0 .5 0.5 0.5 ]
 
 decode_table = decode_table_multi_p(G, p);
 
 
-[B,BG] = groupcounts(decode_table');
+% [B,BG] = groupcounts(decode_table');
+
+BG = 1:2^k ;
+B = zeros(1,2^k) ; 
+
+for c  = decode_table 
+    B(c{1}) = B(c{1}) + 1/ length(c{1}) ;     
+end
 
 
 
@@ -26,8 +34,8 @@ decode_table = decode_table_multi_p(G, p);
 figure;
 pie(B);
 % Add a legend
-% l = legend((arrayfun(@int2str, BG-1,UniformOutput =false)), 'Location', 'Best'); 
-l = legend((arrayfun(@int2str, BG-1,UniformOutput =false))); 
+l = legend((arrayfun(@int2str, BG-1,UniformOutput =false)), 'Location', 'Best'); 
+% l = legend((arrayfun(@int2str, BG-1,UniformOutput =false))); 
 title(l,"Codeword id")
 title('Percentage of codeword preference');
 

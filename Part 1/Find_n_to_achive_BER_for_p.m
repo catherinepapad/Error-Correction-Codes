@@ -1,4 +1,4 @@
-function [n, BER_with_ECC, percentage_of_changed_bits,G,H,dmin] = Find_n_to_achive_BER_for_p( k, p, BER_Threshold,options)% 
+function [n, BER_with_ECC, percentage_of_changed_bits,G,H,dmin] = Find_n_to_achive_BER_for_p( k, p, BER_Threshold, options)% 
 % This MATLAB function is designed to find the minimum block length n needed to achieve a target Bit Error Rate (BER) for a Linear Block Code.
 % 
 %   Parameters:
@@ -34,7 +34,7 @@ function [n, BER_with_ECC, percentage_of_changed_bits,G,H,dmin] = Find_n_to_achi
         BER_Threshold                       (1,1)   double  {mustBeInRange(BER_Threshold,0,1)}
         options.n_min                       (1,1)   double  {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(options.n_min,3)}  = k + 1
         options.n_max                       (1,1)   double  {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(options.n_max,3)}  = 23
-        options.transmitted_data_length     (1,1)   double  {mustBeInteger, mustBePositive} = 10/BER_Threshold
+        options.transmitted_data_length     (1,1)   double  {mustBeInteger, mustBePositive} = 100/BER_Threshold
         options.print_code_info             (1,1)   logical = false
         options.print_progress              (1,1)   logical = false
     end
@@ -51,7 +51,7 @@ function [n, BER_with_ECC, percentage_of_changed_bits,G,H,dmin] = Find_n_to_achi
     % Load values from options to not have to write "options."
     n_min                   = options.n_min                   ; 
     n_max                   = options.n_max                   ; 
-    transmitted_data_length = options.transmitted_data_length ; 
+    transmitted_data_length = options.transmitted_data_length ;
     print_code_info         = options.print_code_info         ; 
     print_progress          = options.print_progress          ; 
     
