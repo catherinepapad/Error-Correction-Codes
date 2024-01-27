@@ -2,8 +2,13 @@ function [max_likelihood] = decode_table_multi_p(G,p)
 %UNTITLED6 Summary of this function goes here
 %   Detailed explanation goes here
 
+    arguments 
+        G       (:,:)   double  {mustBeMember(G, [0, 1])} 
+        p       (1,:)   double  {mustBeInRange(p,0,1)}
+    end
+
     if size(G,2) ~= length(p)
-        error("Should be same")
+        error("The number of columns of G should be the same as p")
     end
 
     [k, n] = size(G) ; 
@@ -36,9 +41,6 @@ function [max_likelihood] = decode_table_multi_p(G,p)
         %               = prob(i) / sum(prob)
 
         % argmax_i ( p(t_i | r_i) ) = argmax_i ( prob(i) )   
-
-        % p_ti_rj = prob / sum(prob) 
-        % [~ , max_likelihood(j)] = max( prob ) ;
 
         temp = max( prob ) ;
 
