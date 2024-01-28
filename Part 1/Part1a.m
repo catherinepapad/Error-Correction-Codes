@@ -17,15 +17,51 @@ Ts = 2*10^-6 ;                      % Symbol duration in seconds
 gray_encoding = true;
 useUnitAveragePower = true; % Set to false if you don't want unit average power
 
+%% Plot parameters 
+plot_all = false ; 
+plots_noisy_symbols     = plot_all || false ;    
+plot_constalletions     = plot_all || false ; 
+plots_symbol_hist       = plot_all || false ;
+plot_final_results      = plot_all || true ; 
+
+%% Print parameters 
 print_all = false;
-plots_noisy_symbols     = print_all || false ;    
-plot_constalletions     = print_all || false ; 
-plots_symbol_hist       = print_all || false ;
-plot_final_results      = print_all || true ; 
 print_code_info         = print_all || false ; 
 print_rates             = print_all || false ;
 print_BER               = print_all || false ; 
 print_current_status    = print_all || true ; 
+
+
+% ============ Save results ============
+
+save_formats = [ "fig" "svg"  "eps" ] ;
+base_folder = "Runs";   % Specify the base folder and auto create one run
+
+%% Save plots parameters 
+save_all = false;
+save_surf_plots     = save_all || true ;
+save_BER_plots      = save_all || true ; 
+save_workspace      = save_all || true ; 
+save_noisy_symbols  = save_all || true ;
+save_histograms     = save_all || true ; 
+
+
+
+% Find the first non existand folder to save the results
+run_number = 1; 
+main_folder = fullfile(base_folder, sprintf('%d', run_number)) ; 
+while ( exist( main_folder , 'dir')  )
+    run_number = run_number + 1 ;
+    main_folder = fullfile(base_folder, sprintf('%d', run_number)) ;     
+end
+
+mkdir(main_folder);
+
+
+diary(fullfile(main_folder, "logs.txt") );
+diary on ;
+
+
 % ============ ============ ============
 
 % Matrices to store the results
@@ -200,7 +236,15 @@ for n_index = 1:length(n_array)
                 hold on ;
                 plot(real(constellation_points), imag(constellation_points), 'bx'); % Original constellation
                 axis equal
-                title( sprintf('Noisy %s-coded %d QAM constellation SNR: %.2f db Codeword length: %d',symbol_encoding, M, SNR_db,n) );
+                temp_title = sprintf('Noisy %s-coded %d QAM constellation SNR: %.2f db Codeword length: %d',symbol_encoding, M, SNR_db,n) ; 
+                title( temp_title );
+
+                if save_noisy_symbols
+                    % Save the plot
+                    file_name = strrep( temp_title , ' ', '_') ; 
+                    save_plots(main_folder, "noisy_symbols", file_name , save_formats  ) ;
+                end
+
             end
             
             % Histogram 
@@ -212,8 +256,16 @@ for n_index = 1:length(n_array)
                 histogram(symbols_ids,edges ,Normalization="probability");
                 xticks(0:M-1);
                 ylabel("Percentage of symbols");
-                xlabel("Symbol id");
-                title(sprintf("Percentages for each symbol k=%d  n=%d  bps=%d (M=%d) Total symbols = %d " ,k ,n, bits_per_symbol,M,length(encodedMessage)/bits_per_symbol));
+                xlabel("Symbol id");      
+                temp_title = sprintf("Percentages for each symbol k=%d  n=%d  bps=%d (M=%d) Total symbols = %d " ,k ,n, bits_per_symbol,M,length(encodedMessage)/bits_per_symbol) ;
+                title(temp_title);
+                
+                if save_histograms 
+                    % Save the plot
+                    file_name = strrep( temp_title , ' ', '_') ; 
+                    save_plots(main_folder, "histograms_PoS", file_name , save_formats  ) ;
+                end
+
             end
             
             if print_BER
@@ -242,3 +294,13 @@ if plot_final_results
         BER_surf_plot;
     end
 end
+
+
+if save_workspace
+    % clear message_in_bits encodedMessage modulated_signal noisy_symbols encoded_demodulated_signal decodedMessage
+    save(fullfile( main_folder,"workspace_variables"));
+
+end
+
+
+diary off ;
