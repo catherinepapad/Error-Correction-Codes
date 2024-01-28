@@ -62,7 +62,7 @@ grid on;
 if save_BER_plots
     for figure_id = [f1 f2 f3]
         file_name = strrep( figure_id.Name, ' ', '_') ; 
-        save_plots(main_folder, "BER_plots_test", file_name , save_formats , figure_id );
+        save_plots(main_folder, "BER_plots", file_name , save_formats , figure_id );
     end
 
 end
