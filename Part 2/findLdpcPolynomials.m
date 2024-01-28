@@ -1,6 +1,6 @@
 
 function [Lambda,Rho] = findLdpcPolynomials(rho, lambda, n)
-    % findLdpcPolynomialsApproximate - Given the rho and lambda distribution polynomials, find the
+    % findLdpcPolynomials - Given the rho and lambda distribution polynomials, find the
     % Lambda and Rho polynomials for the LDPC code.
     % 
     % This function uses an approximate method, as the exact method may

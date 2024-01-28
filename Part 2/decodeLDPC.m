@@ -25,15 +25,15 @@ function x = decodeLDPC(H, y, max_iter, interactive)
     % y = [NaN; 1; 0; NaN; 1; 0];
     % x = decodeLDPC(H, y, 10, true);
 
-    arguments (Input)
-        H               (:,:)   double      {mustBeMember(H, [0, 1])}
-        y               (:,1)   double      {validate_1_0_NaN(y)}
-        max_iter        (1,1)   double      {mustBeInteger, mustBePositive}
-        interactive     (1,1)   logical  
-    end
-    arguments (Output)
-        x               (:,1)   double      {validate_1_0_NaN(x)}
-    end
+    % arguments (Input)
+    %     H               (:,:)   double      {mustBeMember(H, [0, 1])}
+    %     y               (:,1)   double      {validate_1_0_NaN(y)}
+    %     max_iter        (1,1)   double      {mustBeInteger, mustBePositive}
+    %     interactive     (1,1)   logical  
+    % end
+    % arguments (Output)
+    %     x               (:,1)   double      {validate_1_0_NaN(x)}
+    % end
 
     % Initialization
     [m, n] = size(H);
@@ -68,25 +68,20 @@ function x = decodeLDPC(H, y, max_iter, interactive)
         createLDPCDecodingPlot(H, y_history);
     end
 
-    % Final output
-    if sum(isnan(y)) > 0
-        x = NaN;
-    else
-        x = y;
-    end
+    x = y;
 end
 
 
 % Function to do single iteration of decoding
 function [y_next, has_updated ] = decodeIteration(H, y)
-    arguments (Input)
-            H               (:,:)   double      {mustBeMember(H, [0, 1])}
-            y               (:,1)   double      {}
-    end
-    arguments (Output)
-        y_next          (:,1)   double      {}
-        has_updated     (1,1)   logical  
-    end
+    % arguments (Input)
+    %         H               (:,:)   double      {mustBeMember(H, [0, 1])}
+    %         y               (:,1)   double      {}
+    % end
+    % arguments (Output)
+    %     y_next          (:,1)   double      {}
+    %     has_updated     (1,1)   logical  
+    % end
 
     [m, n] = size(H);
     has_updated = false;
