@@ -7,11 +7,11 @@ clear;
 close all ;     
 
 %% Simulation parameters 
-n_array = 4:7;                      % [array] Codeword length
-k = 2;                              % Message length
-SNR_db_array = 20 ;                 % [array] SNR in db
-bits_per_symbol_array = 4:9 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
-D_number_of_bits_to_send_OG = 10^4 ;   % Number of symbols to send
+n_array = 6:10;                      % [array] Codeword length
+k = 5;                              % Message length
+SNR_db_array = 5:1:20 ;                 % [array] SNR in db
+bits_per_symbol_array = 1:8 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+D_number_of_bits_to_send_OG = 10^7 ;   % Number of symbols to send
 Ts = 2*10^-6 ;                      % Symbol duration in seconds
 
 gray_encoding = true;
@@ -20,12 +20,12 @@ useUnitAveragePower = true; % Set to false if you don't want unit average power
 print_all = false;
 plots_noisy_symbols     = print_all || false ;    
 plot_constalletions     = print_all || false ; 
-plots_symbol_hist       = print_all || true ;
-plot_final_results      = print_all || false ; 
+plots_symbol_hist       = print_all || false ;
+plot_final_results      = print_all || true ; 
 print_code_info         = print_all || false ; 
 print_rates             = print_all || false ;
 print_BER               = print_all || false ; 
-print_current_status    = print_all || false ; 
+print_current_status    = print_all || true ; 
 % ============ ============ ============
 
 % Matrices to store the results
@@ -151,7 +151,7 @@ for n_index = 1:length(n_array)
         
                 
         %% Iterate over the differend SNR values
-        for SNR_index = SNR_indices
+        parfor SNR_index = SNR_indices
             SNR_db = SNR_db_array(SNR_index); 
 
             if print_current_status 
@@ -178,8 +178,8 @@ for n_index = 1:length(n_array)
             
             % Decode the received codewords using the linear block code
             % Use the "evalc" function to capture the output from the "disp" function calls that are from the "syndtable" function that the "decode" function calls
-            uselles_output = evalc("decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);");
-            % decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
+            % uselles_output = evalc("decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);");
+            decodedMessage = decode(encoded_demodulated_signal, n, k, 'linear/binary', G);
             
             
             % Compare the original and demodulated symbols after ECC 
