@@ -8,6 +8,18 @@ function save_plots(main_folder, extra_folders, file_name , save_formats , figur
         figure_id    = gcf
     end
 
+
+    %  This way we could change the size of the figure before saving it 
+    % fig = gcf() ; 
+    % 
+    % fig.Units = 'normalized' ;
+    % fig.Position = [0 0 1 1]
+    % 
+    % default_size = [0.3536    0.4231    0.2917    0.3889] ;
+    % medium_size = [0.1818   0.0787   0.5880     0.6898] ;
+    % full_size = [0 0 1 1] ;
+
+
     % Save the plot using saveas
     for i = save_formats
 

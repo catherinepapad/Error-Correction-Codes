@@ -31,12 +31,6 @@ print_rates             = print_all || false ;
 print_BER               = print_all || false ; 
 print_current_status    = print_all || true ; 
 
-
-% ============ Save results ============
-
-save_formats = [ "fig" "svg"  "eps" ] ;
-base_folder = "Runs";   % Specify the base folder and auto create one run
-
 %% Save plots parameters 
 save_all = false;
 save_surf_plots     = save_all || true ;
@@ -44,6 +38,12 @@ save_BER_plots      = save_all || true ;
 save_workspace      = save_all || true ; 
 save_noisy_symbols  = save_all || true ;
 save_histograms     = save_all || true ; 
+
+
+%% Saves path and plots formats
+save_formats = [ "fig" "svg"  "eps" ] ;
+base_folder = "Runs";   % Specify the base folder and auto create one run
+
 
 
 
@@ -57,7 +57,7 @@ end
 
 mkdir(main_folder);
 
-
+% Log console prints
 diary(fullfile(main_folder, "logs.txt") );
 diary on ;
 
@@ -76,7 +76,7 @@ n_indices = 1:length(n_array);
 SNR_indices = 1:length(SNR_db_array);
 
 
-% Auto generated parameters
+% Encoding scheme 
 if gray_encoding
     symbol_encoding = 'gray';
 else
@@ -85,11 +85,10 @@ end
 
 tic 
 
+%% Simulation 
 % Iterate over the differend Codeword lengths 
 for n_index = 1:length(n_array)
     n = n_array(n_index); 
-
-
 
 
     if print_current_status 
@@ -247,7 +246,7 @@ for n_index = 1:length(n_array)
 
             end
             
-            % Histogram 
+            % Histogram     Percentages for each symbol
             if plots_symbol_hist && SNR_index == 1
                 figure;
                 % Set the edges to cover integers from 0 to M-1
