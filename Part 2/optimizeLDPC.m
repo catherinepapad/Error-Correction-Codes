@@ -1,4 +1,11 @@
 function [rho_correct,lambda_correct] = optimizeLDPC(r_avg,l_max,epsilon,interval)
+    arguments
+        r_avg (1,1) double {mustBePositive}
+        l_max (1,1) double {mustBeInteger, mustBePositive}
+        epsilon (1,1) double {mustBePositive}
+        interval (1,1) double {mustBePositive} = 0.01
+    end
+    
     % rho_correct starts from rho_1 
     % lambda starts from lambda_1
     % coefficient with index 1 corresponds to x^0

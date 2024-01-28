@@ -1,15 +1,14 @@
 
 % Create irregular LDPC code
-r_avg = 5.5;
-l_max = 5;
+r_avg = 6.5;
+l_max = 6;
 epsilon = 0.05;
-interval = 0.05;
 
 % Get the distribution of the degree polynomials
-[rho, lambda] = optimizeLDPC(r_avg, l_max, epsilon, interval);
+[rho, lambda] = optimizeLDPC(r_avg, l_max, epsilon);
 
 % Find the degree polynomials for given codeword length (n)
-n = 32;
+n = 210;
 [Lambda,Rho] = findLdpcPolynomials(rho, lambda, n);
 
 % Create a regular LDPC code with the same rate and codeword 
@@ -17,54 +16,28 @@ n = 32;
 k = n-sum(Rho);
 rmax = find(rho, 1, 'last');
 lmax = find(lambda, 1, 'last');
-[Reg_Lambda, Reg_Rho] = createRegularLdpc(n, k, rmax, lmax);
-
-
-
+desired_code_rate = k/n;
+[Reg_Lambda, Reg_Rho] = createRegularLdpc(n, desired_code_rate, rmax, lmax);
+Reg_n = sum(Reg_Lambda);
+Reg_k = Reg_n-sum(Reg_Rho);
 
 % Simulate the performance of the irregular and regular LDPC codes
-LDPC_iterations = 5;
-
-% irregular_failure_rates = zeros(LDPC_iterations, n);
-% irregular_erasure_rates = zeros(LDPC_iterations, n);
-% for i = 1:LDPC_iterations
-%     [irregular_failure_rates(i, :), irregular_erasure_rates(i, :)] = simulateLdpcAll(Lambda, Rho);
-% end
-
-% regular_failure_rates = zeros(LDPC_iterations, n);
-% regular_erasure_rates = zeros(LDPC_iterations, n);
-% for i = 1:LDPC_iterations
-%     [regular_failure_rates(i, :), regular_erasure_rates(i, :)] = simulateLdpcAll(Reg_Lambda, Reg_Rho);
-% end
-
-
-
-
-
-sim_iterations = 10000;
+LDPC_iterations = 20;
+sim_iterations = 1000;
 
 irregular_failure_rates = zeros(LDPC_iterations, 1);
 irregular_erasure_rates = zeros(LDPC_iterations, 1);
 for i = 1:LDPC_iterations
-    [irregular_failure_rates(i), irregular_erasure_rates(i)] = simulateLdpcRandom(Lambda, Rho, epsilon, sim_iterations);
+    [irregular_erasure_rates(i), irregular_failure_rates(i)] = simulateLdpcRandom(Lambda, Rho, epsilon, sim_iterations);
 end
 
 regular_failure_rates = zeros(LDPC_iterations, 1);
 regular_erasure_rates = zeros(LDPC_iterations, 1);
 for i = 1:LDPC_iterations
-    [regular_failure_rates(i), regular_erasure_rates(i)] = simulateLdpcRandom(Reg_Lambda, Reg_Rho, epsilon, sim_iterations);
+    [regular_erasure_rates(i), regular_failure_rates(i)] = simulateLdpcRandom(Reg_Lambda, Reg_Rho, epsilon, sim_iterations);
 end
 
-
-% figure;
-% histogram(failure_rates, 'Normalization', 'probability');
-% % Create a string for the polynomial in the form 1 + x^a + x^b + ...
-% Lambda_string = polyToString(Lambda);
-% Rho_string = polyToString(Rho);
-% title( sprintf('LDPC(%d,%d), epsilon=%g\n Lambda = %s , Rho = %s\n LDPCs=%d, %d simulations each', n, n-r, epsilon, Lambda_string, Rho_string, LDPC_iterations, sim_iterations));
-% xlabel('Failure rate');
-% ylabel('Probability');
-
+% Plots!
 Irregular_Lambda_string = polyToString(Lambda);
 Irregular_Rho_string = polyToString(Rho);
 
@@ -72,17 +45,26 @@ Regular_Lambda_string = polyToString(Reg_Lambda);
 Regular_Rho_string = polyToString(Reg_Rho);
 
 % Plot the distribution of the erasure rates for irregular and regular LDPC
-% codes
 figure;
 histogram(irregular_erasure_rates, 'Normalization', 'probability');
 hold on;
 histogram(regular_erasure_rates, 'Normalization', 'probability');
-% title( sprintf('LDPC(%d,%d), epsilon=%g\n Lambda = %s , Rho = %s\n LDPCs=%d, %d simulations each', n, n-r, epsilon, Lambda_string, Rho_string, LDPC_iterations, sim_iterations));
 title( ... 
-    sprintf('LDPC(%d,%d), epsilon=%g\n IrrLambda = %s , IrrRho = %s\n RegLambda = %s , RegRho = %s\n LDPCs=%d, %d simulations each', ...
-    n, n-k, epsilon, Irregular_Lambda_string, Irregular_Rho_string, Regular_Lambda_string, Regular_Rho_string, LDPC_iterations, sim_iterations));
-
+    sprintf('epsilon=%g\n IrrLDPC(%d,%d): IrrLambda = %s , IrrRho = %s\n RegLDPC(%d,%d): RegLambda = %s , RegRho = %s\n LDPCs=%d, %d simulations each', ...
+    epsilon, n, k, Irregular_Lambda_string, Irregular_Rho_string, Reg_n, Reg_k, Regular_Lambda_string, Regular_Rho_string, LDPC_iterations, sim_iterations));
 xlabel('Erasure rate');
+ylabel('Probability');
+legend('Irregular', 'Regular');
+
+% Plot the distribution of the failure rates for irregular and regular LDPC
+figure;
+histogram(irregular_failure_rates, 'Normalization', 'probability');
+hold on;
+histogram(regular_failure_rates, 'Normalization', 'probability');
+title( ... 
+    sprintf('epsilon=%g\n IrrLDPC(%d,%d): IrrLambda = %s , IrrRho = %s\n RegLDPC(%d,%d): RegLambda = %s , RegRho = %s\n LDPCs=%d, %d simulations each', ...
+    epsilon, n, k, Irregular_Lambda_string, Irregular_Rho_string, Reg_n, Reg_k, Regular_Lambda_string, Regular_Rho_string, LDPC_iterations, sim_iterations));
+xlabel('Failure rate');
 ylabel('Probability');
 legend('Irregular', 'Regular');
 
@@ -98,7 +80,7 @@ function poly_string = polyToString(poly)
     end
 end
 
-function [failure_rates, erasure_rates] = simulateLdpcAll(Lambda, Rho)
+function [erasure_rates, failure_rates] = simulateLdpcAll(Lambda, Rho)
     % Simulates the performance of a single LDPC code by simulating all
     % possible erasure permutations
 
@@ -152,12 +134,10 @@ function [erasure_rate, failure_rate] = simulateLdpcRandom(Lambda, Rho, epsilon,
     n_erasures_EC = 0;
     n_failures_EC = 0;
     [H, G] = createLdpcFromPoly(Lambda, Rho);
+    [k, n] = size(G);
     for i = 1:sim_iterations
-        % Create random message
-        message = randi([0 1], 1, size(G,1));
-
-        % Encode message
-        codeword = mod(message*G, 2);
+        % Create codeword
+        codeword = zeros(1, n);
 
         % Simulate binary erasure channel with erasure probability epsilon
         received = codeword;
@@ -181,7 +161,7 @@ function [erasure_rate, failure_rate] = simulateLdpcRandom(Lambda, Rho, epsilon,
         end
     end
     
-    erasure_rate = n_erasures_EC / (sim_iterations * size(G,1));
+    erasure_rate = n_erasures_EC / (sim_iterations * n);
     failure_rate = n_failures_EC / sim_iterations;
 
 end
