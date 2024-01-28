@@ -7,7 +7,7 @@ clear;
 close all ;     
 
 %% Simulation parameters 
-n_array = 5;                      % [array] Codeword length
+n_array = 3:4;                      % [array] Codeword length
 k = 2;                              % Message length
 SNR_db_array = 20 ;                 % [array] SNR in db
 bits_per_symbol_array = 4 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
