@@ -7,10 +7,10 @@ clear;
 close all ;     
 
 %% Simulation parameters 
-n_array = 6:10;                      % [array] Codeword length
-k = 5;                              % Message length
-SNR_db_array = 5:1:20 ;                 % [array] SNR in db
-bits_per_symbol_array = 1:8 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+n_array = 3:4;                      % [array] Codeword length
+k = 2;                              % Message length
+SNR_db_array = 20 ;                 % [array] SNR in db
+bits_per_symbol_array = 4 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
 D_number_of_bits_to_send_OG = 10^7 ;   % Number of symbols to send
 Ts = 2*10^-6 ;                      % Symbol duration in seconds
 
@@ -19,20 +19,20 @@ useUnitAveragePower = true; % Set to false if you don't want unit average power
 
 %% Plot parameters 
 plot_all = false ; 
-plots_noisy_symbols     = plot_all || false ;    
+plots_noisy_symbols     = plot_all || true ;    
 plot_constalletions     = plot_all || false ; 
-plots_symbol_hist       = plot_all || false ;
-plot_final_results      = plot_all || true ; 
+plots_symbol_hist       = plot_all || true ;
+plot_final_results      = plot_all || false ; 
 
 %% Print parameters 
 print_all = false;
 print_code_info         = print_all || false ; 
 print_rates             = print_all || false ;
 print_BER               = print_all || false ; 
-print_current_status    = print_all || true ; 
+print_current_status    = print_all || false ; 
 
 %% Save plots parameters 
-save_all = false;
+save_all = true;
 save_surf_plots     = save_all || true ;
 save_BER_plots      = save_all || true ; 
 save_workspace      = save_all || true ; 
@@ -186,7 +186,7 @@ for n_index = 1:length(n_array)
         
                 
         %% Iterate over the differend SNR values
-        parfor SNR_index = SNR_indices
+        for SNR_index = SNR_indices
             SNR_db = SNR_db_array(SNR_index); 
 
             if print_current_status 
@@ -241,6 +241,8 @@ for n_index = 1:length(n_array)
                 if save_noisy_symbols
                     % Save the plot
                     file_name = strrep( temp_title , ' ', '_') ; 
+                    file_name = strrep( file_name , '.', '_') ; 
+                    file_name = strrep( file_name , ':', '') ; 
                     save_plots(main_folder, "noisy_symbols", file_name , save_formats  ) ;
                 end
 
@@ -296,7 +298,7 @@ end
 
 
 if save_workspace
-    % clear message_in_bits encodedMessage modulated_signal noisy_symbols encoded_demodulated_signal decodedMessage
+    clear message_in_bits encodedMessage modulated_signal noisy_symbols encoded_demodulated_signal decodedMessage symbols_ids
     save(fullfile( main_folder,"workspace_variables"));
 
 end

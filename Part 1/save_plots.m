@@ -5,7 +5,7 @@ function save_plots(main_folder, extra_folders, file_name , save_formats , figur
         extra_folders
         file_name
         save_formats
-        figure_id    = gcf
+        figure_id    = gcf()
     end
 
 
@@ -29,7 +29,13 @@ function save_plots(main_folder, extra_folders, file_name , save_formats , figur
         if ~exist(directoryPath, 'dir')
             mkdir(directoryPath);
         end
-
+    
         saveas(figure_id, fullfile(directoryPath,file_name) , i); % 'gcf' refers to the current figure
     end
+
+
 end
+
+
+
+
