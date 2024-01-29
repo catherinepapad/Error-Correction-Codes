@@ -290,9 +290,9 @@ toc
 
 %% Call other scripts that make plots
 if plot_final_results
-    plot_resutls;
+    plot_Part1a_resutls;
     if length(bits_per_symbol_array) > 1 &&  length(n_array) > 1
-        BER_surf_plot;
+        plot_Part1a_surfs;
     end
 end
 
