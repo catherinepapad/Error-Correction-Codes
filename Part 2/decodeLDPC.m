@@ -1,7 +1,7 @@
-function x = decodeLDPC(H, y, max_iter, interactive)
+function x = decodeLDPC(H, y, interactive, max_iter)
     % decodeLDPC - Decoder for irregular LDPC codes in the binary erasure channel
     % 
-    %   x = decodeLDPC(H, y, max_iter, interactive) decodes the received vector y
+    %   x = decodeLDPC(H, y, interactive, max_iter) decodes the received vector y
     %   using the parity check matrix H. The decoding is done using an iterative
     %   message passing algorithm. The algorithm is stopped if either the algorithm
     %   converges or the maximum number of iterations is reached.
@@ -10,8 +10,8 @@ function x = decodeLDPC(H, y, max_iter, interactive)
     % Parameters:
     %   H: parity check matrix
     %   y: received vector (erasures are represented by NaNs)
-    %   max_iter: maximum number of iterations
     %   interactive: if true, allows interactive stepping through iterations
+    %   max_iter: maximum number of iterations
     % 
     % Output:
     %   x: decoded vector
@@ -23,17 +23,17 @@ function x = decodeLDPC(H, y, max_iter, interactive)
     %       0 1 1 0 0 1;
     %       1 0 0 1 0 1];
     % y = [NaN; 1; 0; NaN; 1; 0];
-    % x = decodeLDPC(H, y, 10, true);
+    % x = decodeLDPC(H, y, true, 100);
 
-    % arguments (Input)
-    %     H               (:,:)   double      {mustBeMember(H, [0, 1])}
-    %     y               (:,1)   double      {validate_1_0_NaN(y)}
-    %     max_iter        (1,1)   double      {mustBeInteger, mustBePositive}
-    %     interactive     (1,1)   logical  
-    % end
-    % arguments (Output)
-    %     x               (:,1)   double      {validate_1_0_NaN(x)}
-    % end
+    arguments (Input)
+        H               (:,:)   double
+        y               (:,1)   double
+        interactive     (1,1)   logical = false
+        max_iter        (1,1)   double {mustBeInteger, mustBePositive} = 100
+    end
+    arguments (Output)
+        x               (:,1)   double
+    end
 
     % Initialization
     [m, n] = size(H);
@@ -195,15 +195,6 @@ function [G, variableNodes, checkNodes] = createBipartiteGraph(H)
             end
         end
     end
-end
-
-
-
-
-
-function [] = validate_1_0_NaN(y)
-    % Check if all elements are either 0, 1, or NaN
-    mustBeMember(y(~isnan(y)), [0, 1])        
 end
 
 

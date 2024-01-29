@@ -2,7 +2,7 @@
 % Create irregular LDPC code
 r_avg = 6.5;
 l_max = 6;
-epsilon = 0.05;
+epsilon = 0.25;
 
 % Get the distribution of the degree polynomials
 [rho, lambda] = optimizeLDPC(r_avg, l_max, epsilon);
@@ -151,7 +151,11 @@ function [erasure_rate, failure_rate] = simulateLdpcRandom(Lambda, Rho, epsilon,
         end
 
         % Decode received message
-        decoded = decodeLDPC(H, received, 1000, false);
+        decoded = decodeLDPC(H, received, false);
+
+        % If no erasures, the codeword can be decoded (calculate syndrome etc.)
+        % (matlab 'decode' function can do this)
+        % If there are erasures, the codeword cannot be decoded
 
         % Count erasures after error correction
         decoded_erasures = sum(isnan(decoded));
