@@ -5,10 +5,10 @@
 
 %% Plotting BER with ECC on subplots with logarithmic scale and markers
 f1 = figure("Name",'BER with ECC');
-sgtitle('BER with ECC') 
-for j = 1:length(n_array)
-    
-    subplot(length(n_array), 1, j);
+tt = tiledlayout(length(n_array), 1, "TileSpacing","tight") ;
+title(tt,'BER with ECC')
+for j = 1:length(n_array)    
+    nexttile
     for i = 1:length(bits_per_symbol_array)
         semilogy(SNR_db_array, squeeze(ALL_BER_with_ECC(:, i, j)), 'x-', 'DisplayName', num2str(bits_per_symbol_array(i)) );
         hold on;
@@ -24,10 +24,10 @@ end
 
 %% Plotting BER without ECC on subplots with logarithmic scale and markers
 f2 = figure("Name",'BER without ECC');
-sgtitle('BER without ECC') 
+tt = tiledlayout(length(n_array), 1, "TileSpacing","tight");
+title(tt,'BER without ECC' )
 for j = 1:length(n_array)
-    
-    subplot(length(n_array), 1, j);
+    nexttile
     for i = 1:length(bits_per_symbol_array)
         semilogy(SNR_db_array, squeeze(ALL_BER_non_ECC(:, i, j)), 'x-', 'DisplayName', num2str(bits_per_symbol_array(i)));
         hold on;

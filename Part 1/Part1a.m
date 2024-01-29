@@ -161,7 +161,7 @@ for n_index = 1:length(n_array)
         % Calculate bit rate of the communication channel (Rb) in bits per second
         Rb = 1 / Tb;    % [bits/sec]
         
-        % Calculate bit rate of the usefull information (Rb_code) in bits per second
+        % Calculate bit rate of the useful information (Rb_code) in bits per second
         Rb_code = R * Rb ;  % [bits/sec]
 
 % Store result to plot later
