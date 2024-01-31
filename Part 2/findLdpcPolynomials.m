@@ -46,8 +46,8 @@ function [Lambda,Rho] = findLdpcPolynomials(rho, lambda, n)
     r_len = r_max-1;
 
     f = [zeros(1,l_len), ones(1,r_len)];
-    A_ = [zeros(1,l_len), ones(1,r_len)];
-    b_ = ceil(A);
+    A_ = -[zeros(1,l_len), ones(1,r_len)];
+    b_ = -ceil(A);
     Aeq = [ones(1,l_len), zeros(1,r_len); (2:l_max), -(2:r_max)];
     beq = [n - sum(L_hat); sum(R_hat .* (1:r_max)) - sum(L_hat .* (1:l_max))];
     lb = zeros(1,l_len+r_len);
@@ -72,7 +72,7 @@ function [Lambda,Rho] = findLdpcPolynomials(rho, lambda, n)
 
     f = -[zeros(1,l_len), ones(1,r_len)];
     A_ = [zeros(1,l_len), ones(1,r_len)];
-    b_ = -floor(A);
+    b_ = floor(A);
     Aeq = [ones(1,l_len), zeros(1,r_len); (2:l_max), -(2:r_max)];
     beq = [n - sum(L_hat); sum(R_hat .* (1:r_max)) - sum(L_hat .* (1:l_max))];
     lb = zeros(1,l_len+r_len);
