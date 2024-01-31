@@ -146,7 +146,7 @@ for n_index = 1:length(n_array)
             temp_plot_constalletions = false ; 
         end
         % Calculate the mean energy of the constalletion
-        constellation_points = qammod(0:M-1 , M ,'UnitAveragePower', useUnitAveragePower,'PlotConstellation',temp_plot_constalletions); 
+        constellation_points = qammod(0:M-1 , M ,symbol_encoding,'UnitAveragePower', useUnitAveragePower,'PlotConstellation',temp_plot_constalletions); 
         % constellation_energy = mean(abs(constellation_points).^2) ;  % This is 1 when useUnitAveragePower is true            
 
     
