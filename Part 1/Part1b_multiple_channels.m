@@ -10,9 +10,10 @@ channels = 10 ;
 desired_BER = 10^-2 ;
 k_arr = repmat(2, 1, channels ) ;
 p_arr =  linspace(0.002,0.05,channels);
-% p_arr =   repmat(0.01, 1, channels ) ;
-Capacity_arr = linspace( 10^5 , 10^6, channels ) ; % [bits/sec] capacity of each channel 
+% p_arr =   repmat(0.002, 1, channels ) ;
+Capacity_arr = linspace( 10^6 , 10^6, channels ) ; % [bits/sec] capacity of each channel 
 
+save_pie_plot = true ; 
 
 % Find optimal 
 [n_cell_arr, BER_with_ECC_cell_arr, ~, G_cell_arr, ~, dmin_cell_arr] = arrayfun(@(x) Find_n_to_achive_BER_for_p(k_arr(x), p_arr(x), desired_BER),1:channels ...
@@ -48,6 +49,40 @@ l = legend((arrayfun(@int2str, 1:channels,UniformOutput =false)), 'Location', 'B
 title(l,"Channel")
 title('Percentage of data to send through each channel');
 
+
+
+% Save plots and tables
+
+main_folder = 'Runs\\Part1b\\Pie_plots_multiple_channels' ;
+excel_file_name = 'Multiple_Channels.xlsx' ;
+
+full_relative_name = fullfile(main_folder,excel_file_name) ;
+
+% Check if the directory exists, if not, create it
+if ~exist(main_folder, 'dir')
+    mkdir(main_folder);
+end
+
+% Determine to witch sheet to write 
+if exist(full_relative_name,'file') == 2
+    number_of_sheets = length(sheetnames(full_relative_name));
+else
+    number_of_sheets = 0;
+end
+
+
+name = sprintf("Run_%d_Chanells_%d_BER_%g",number_of_sheets+1, channels, desired_BER  ) ; 
+
+
+if save_pie_plot  
+    plot_name = strrep( name, '.', '_') ; 
+    save_plots(main_folder, "", plot_name , ["fig"  "svg"]  );  
+
+end
+
+
+% Save the table to an Excel file
+writetable(result_table, full_relative_name, 'Sheet',name  );
 
 
 
