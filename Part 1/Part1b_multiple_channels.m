@@ -13,7 +13,7 @@ p_arr =  linspace(0.002,0.05,channels);
 % p_arr =   repmat(0.002, 1, channels ) ;
 Capacity_arr = linspace( 10^6 , 10^6, channels ) ; % [bits/sec] capacity of each channel 
 
-save_pie_plot = true ; 
+save_pie_plot = false ; 
 
 % Find optimal 
 [n_cell_arr, BER_with_ECC_cell_arr, ~, G_cell_arr, ~, dmin_cell_arr] = arrayfun(@(x) Find_n_to_achive_BER_for_p(k_arr(x), p_arr(x), desired_BER),1:channels ...
@@ -45,7 +45,7 @@ disp(result_table);
 figure;
 pie(data_portion);
 % Add a legend
-l = legend((arrayfun(@int2str, 1:channels,UniformOutput =false)), 'Location', 'Best'); 
+l = legend((arrayfun(@int2str, 1:channels,UniformOutput =false)), 'Location', 'northeastoutside'); 
 title(l,"Channel")
 title('Percentage of data to send through each channel');
 
