@@ -103,8 +103,8 @@ end
 
 function createLDPCDecodingPlot(H, y_history)
     arguments
-        H               (:,:)   double      {mustBeMember(H, [0, 1])}
-        y_history       (:,:)   double      {validate_1_0_NaN(y_history)}
+        H               (:,:)   double      %{mustBeMember(H, [0, 1])}
+        y_history       (:,:)   double      %{validate_1_0_NaN(y_history)}
     end
 
     [m, n] = size(H);
@@ -171,7 +171,8 @@ function createLDPCDecodingPlot(H, y_history)
         % Label variable nodes with their values
         h.NodeLabel(1:n) = arrayfun(@(x) sprintf('%d', x), y, 'UniformOutput', false);
         h.NodeLabel(n+1:n+m) = arrayfun(@(x) sprintf('C%d', x), 1:m, 'UniformOutput', false);
-        
+        set(gca,'XTick',[]);
+        set(gca,'YTick',[]);
         drawnow;
     end
 end
