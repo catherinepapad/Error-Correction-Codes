@@ -5,8 +5,11 @@
 % To suppress warnings about unreachable code
 %#ok<*UNRCH>
 
+save_BLER_plots  = false ; 
+base_folder = 'Runs\\Part1b\\BLER_T_ack_plots' ;
+
 k = 2;          % Message length
-n_arr = 3:7;  % Codeword length
+n_arr = 3:10;  % Codeword length
 
 p_arr = logspace(-5,log10(0.5),15);
 % repmat(0.1, length(n_arr),1); 
@@ -18,9 +21,10 @@ p_arr = logspace(-5,log10(0.5),15);
 % during data transmission.
 
 % Set the initial length of transmitted data
-transmitted_data_length = 10^5; 
+transmitted_data_length = 10^7; 
 rate = 10^-6 ; %[sec/bit]  The speed of the comunication channel
-T_ack_arr = logspace(-3 , 6 , 6); % [sec]
+
+T_ack_arr = logspace(-6 , 6 , 13); % [sec]
 
 % Printing parameters
 print_code_info = false;
@@ -81,7 +85,7 @@ for i = 1:length(n_arr)
     % Encode the message using the linear block code
     encodedMessage_og = encode(message, n, k, 'linear/binary', G);
 
-    for j = 1:length(p_arr)
+    parfor j = 1:length(p_arr)
         p = p_arr(j);
 
         % Copy the original message 
@@ -97,8 +101,8 @@ for i = 1:length(n_arr)
         
         
         % Decode the received codeword using the linear block code
-        % decodedMessage = decode(encodedMessage, n, k, 'linear/binary', G);
-        uselles_output = evalc("decodedMessage = decode(encodedMessage, n, k, 'linear/binary', G);");
+        decodedMessage = decode(encodedMessage, n, k, 'linear/binary', G);
+        % uselles_output = evalc("decodedMessage = decode(encodedMessage, n, k, 'linear/binary', G);");
                     
         
         
@@ -128,11 +132,43 @@ for i = 1:length(n_arr)
 end
 toc
 
+
+% ============================== END simulations ==============================
+
+
+%% Find were to save plots
+
+if save_BLER_plots
+    % Check if the directory exists, if not, create it
+    if ~exist(base_folder, 'dir')
+        mkdir(base_folder);
+    end
+    
+    
+    
+    % Find the first non existand folder to save the results
+    run_number = 1; 
+    main_folder = fullfile(base_folder, sprintf('%d', run_number)) ; 
+    while ( exist( main_folder , 'dir')  )
+        run_number = run_number + 1 ;
+        main_folder = fullfile(base_folder, sprintf('%d', run_number)) ;     
+    end
+    mkdir(main_folder);
+end
+
+
+
+
+
+
+
+
+
 %% BLER
 
 figure ; 
 plot(n_arr , flip(block_error_rate,2) ,Marker="+" , LineWidth=1);
-leg = legend(arrayfun(@num2str,flip(p_arr),'UniformOutput',false),Location="best");
+leg = legend(arrayfun(@num2str,flip(p_arr),'UniformOutput',false),'Location', 'northeastoutside');
 title(leg,'p');
 xticks(n_arr);
 set(gca, 'YScale', 'log');
@@ -141,6 +177,9 @@ xlabel("n");
 grid on;
 title(sprintf("Block Error Rate k=%d" ,k));
 
+if save_BLER_plots
+    save_plots(main_folder, "", sprintf("BLER_k=%d",k) , ["fig"  "svg"]  );  
+end
 
 
 %% E(T|n) no T_ack ( T_ack = 0 ) 
@@ -152,7 +191,7 @@ T_simple = rate * ( repmat(n_arr' , 1, length(p_arr)) .* meanX );
 
 figure; 
 plot(n_arr , flip(T_simple,2) ,Marker="+" , LineWidth=1);
-leg = legend(arrayfun(@num2str,flip(p_arr),'UniformOutput',false),Location="best");
+leg = legend(arrayfun(@num2str,flip(p_arr),'UniformOutput',false),'Location', 'northeastoutside');
 
 title(leg,'p');
 xticks(n_arr);
@@ -161,6 +200,12 @@ ylabel("E(T|n) [sec]");
 xlabel("n");
 grid on;
 title(sprintf("E(T|n)  k=%d  " ,k ));
+
+
+if save_BLER_plots  
+    plot_name = sprintf("E(T_given_n)_k=%d___T_ack=0" ,k);
+    save_plots(main_folder, "", plot_name , ["fig"  "svg"]  ); 
+end
 
 
 %% E(T|n) with T_ack
@@ -175,7 +220,7 @@ for T_ack = T_ack_arr
     
     figure;     
     plot(n_arr , flip(T_with_ack,2) ,Marker="o" , LineWidth=1);
-    leg = legend(arrayfun(@(x) num2str(x, "%.3g"),p_arr ,'UniformOutput',false),Location="best");
+    leg = legend(arrayfun(@(x) num2str(x, "%.3g"),flip(p_arr) ,'UniformOutput',false),'Location', 'northeastoutside');
     
     title(leg,'p');
     xticks(n_arr);
@@ -183,12 +228,18 @@ for T_ack = T_ack_arr
     ylabel("E(T|n) [sec]");
     xlabel("n");
     grid on;
+
+
     title(sprintf("E(T|n) k=%d  T_{ack} = %2.2g" ,k , T_ack));
+
+    
+    if save_BLER_plots  
+        name = sprintf("E(T_given_n)_k=%d___T_ack=%2.2g" ,k , T_ack);
+        plot_name = strrep( name, '.', '_') ; 
+        save_plots(main_folder, "with_T_ack", plot_name , ["fig"  "svg"]  ); 
+    end
+
 end
-
-
-
-
 
 
 
