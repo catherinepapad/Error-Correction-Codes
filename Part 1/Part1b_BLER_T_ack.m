@@ -22,7 +22,7 @@ p_arr = logspace(-5,log10(0.5),15);
 
 % Set the initial length of transmitted data
 transmitted_data_length = 10^7; 
-rate = 10^-6 ; %[sec/bit]  The speed of the comunication channel
+rate = 10^-6 ; %[sec/bit]  The speed of the communication channel
 
 T_ack_arr = logspace(-6 , 6 , 13); % [sec]
 
@@ -228,8 +228,6 @@ for T_ack = T_ack_arr
     ylabel("E(T|n) [sec]");
     xlabel("n");
     grid on;
-
-
     title(sprintf("E(T|n) k=%d  T_{ack} = %2.2g" ,k , T_ack));
 
     
