@@ -23,7 +23,7 @@ end
 
 
 %% Plotting BER without ECC on subplots with logarithmic scale and markers
-f2 = figure("Name",'BER without ECC');
+f2 = figure("Name",'BER before ECC');
 tt = tiledlayout(length(n_array), 1, "TileSpacing","tight");
 title(tt,'BER without ECC' )
 for j = 1:length(n_array)
