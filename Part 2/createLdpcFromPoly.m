@@ -113,7 +113,8 @@ function [H, G] = createLdpcFromPoly(lambda_poly, rho_poly)
     end
 
     if(size(duplicate_list, 2) > 0)
-        fprintf('Duplicates found: %d\n', size(duplicate_list, 2));
+        % fprintf('Duplicates found: %d\n', size(duplicate_list, 2));
+
         % For the duplicates, first shuffle the list so that nodes are connected randomly
         % (just rotating the check node indices by 1 will work), and then add to H
         duplicate_list(1, :) = circshift(duplicate_list(1, :), 1);
@@ -123,7 +124,7 @@ function [H, G] = createLdpcFromPoly(lambda_poly, rho_poly)
         end
 
         % Print how many duplicates there are in H (hopefully 0)
-        fprintf('Duplicates dropped from %d to %d\n',  size(duplicate_list, 2), sum(sum(H > 1)));
+        % fprintf('Duplicates dropped from %d to %d\n',  size(duplicate_list, 2), sum(sum(H > 1)));
     end
 
     % display(H);
