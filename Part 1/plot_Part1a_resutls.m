@@ -25,7 +25,7 @@ end
 %% Plotting BER before ECC on subplots with logarithmic scale and markers
 f2 = figure("Name",'BER before ECC');
 tt = tiledlayout(length(n_array), 1, "TileSpacing","tight");
-title(tt,'BER without ECC' )
+title(tt,'BER before ECC' )
 for j = 1:length(n_array)
     nexttile
     for i = 1:length(bits_per_symbol_array)

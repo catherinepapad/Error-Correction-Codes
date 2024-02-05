@@ -41,7 +41,7 @@ save_histograms     = save_all || true ;
 
 
 %% Saves path and plots formats
-save_formats = [ "fig" "svg"  "eps" ] ;
+save_formats = [ "fig" "svg" ] ; % ie. "fig" "svg" "eps" etc.
 base_folder = "Runs\\Part1a";   % Specify the base folder and auto create one run
 
 
