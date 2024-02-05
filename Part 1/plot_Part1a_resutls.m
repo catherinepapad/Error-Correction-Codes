@@ -16,7 +16,7 @@ for j = 1:length(n_array)
     title(['Codeword length - n: ', num2str(n_array(j))]);
     xlabel('SNR (dB)');
     ylabel('BER');
-    leg = legend;
+    leg = legend('Location', 'eastoutside');
     title(leg,'bps')
     grid on;
 end
@@ -35,7 +35,7 @@ for j = 1:length(n_array)
     title(['Codeword length - n: ', num2str(n_array(j))]);
     xlabel('SNR (dB)');
     ylabel('BER');
-    leg = legend;
+    leg = legend('Location', 'eastoutside');
     title(leg,'bps')
     grid on;
 end
