@@ -36,11 +36,11 @@ function [max_likelihood] = decode_table_multi_p(G,p)
 
         % p(r_j) = sum(prob) / (2^k)
         % p(t_i) = 1  / (2^k)
-        % p(r_i | t_i) = prob(i) 
-        % p(t_i | r_i) = p(r_i | t_i) * p(t_i) / p(r_j)
+        % p(r_j | t_i) = prob(i) 
+        % p(t_i | r_j) = p(r_j | t_i) * p(t_i) / p(r_j)
         %               = prob(i) / sum(prob)
 
-        % argmax_i ( p(t_i | r_i) ) = argmax_i ( prob(i) )   
+        % argmax_i ( p(t_i | r_j) ) = argmax_i ( prob(i) )   
 
         temp = max( prob ) ;
 

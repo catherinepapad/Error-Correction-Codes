@@ -1,11 +1,11 @@
 
 % Create irregular LDPC code
-r_avg = 6;
+r_avg_list = [3.5 4 6 8];
 l_max = 10;
 epsilon = 0.4;
-n_list = [20 100 200 500];
+n = 200;
 
-for n = n_list
+for r_avg = r_avg_list
 
     % Get the distribution of the degree polynomials
     [rho, lambda] = optimizeLDPC(r_avg, l_max, epsilon);
@@ -22,13 +22,13 @@ for n = n_list
     [Reg_Lambdas, Reg_Rhos] = createRegularLdpc(n, desired_code_rate, rmax, lmax);
 
     % Simulate the performance of the irregular and regular LDPC codes
-    LDPC_iterations = 40;
-    sim_iterations = 200;
+    LDPC_iterations = 200;
+    sim_iterations = 100;
 
 
     irregular_failure_rates = zeros(LDPC_iterations, 1);
     irregular_erasure_rates = zeros(LDPC_iterations, 1);
-    for i = 1:LDPC_iterations
+    parfor i = 1:LDPC_iterations
         [irregular_erasure_rates(i), irregular_failure_rates(i)] = simulateLdpcRandom(Lambda, Rho, epsilon, sim_iterations);
     end
 
@@ -49,7 +49,7 @@ for n = n_list
         regular_erasure_rates = zeros(LDPC_iterations, 1);
         Reg_Lambda = Reg_Lambdas(i, :);
         Reg_Rho = Reg_Rhos(i, :);
-        for j = 1:LDPC_iterations
+        parfor j = 1:LDPC_iterations
             [regular_erasure_rates(j), regular_failure_rates(j)] = simulateLdpcRandom(Reg_Lambda, Reg_Rho, epsilon, sim_iterations);
         end
         
@@ -117,11 +117,11 @@ for n = n_list
     drawnow;
 end
 
-% figs = findobj('Type', 'figure'); % Finds all open figure windows
-% for i = 1:length(figs)
-%     figure(figs(i)); % Makes the i-th figure current
-%     ylim([0 0.4]); % Set your desired y-axis limits
-% end
+figs = findobj('Type', 'figure'); % Finds all open figure windows
+for i = 1:length(figs)
+    figure(figs(i)); % Makes the i-th figure current
+    ylim([0 0.4]); % Set your desired y-axis limits
+end
 
 
 
@@ -148,7 +148,7 @@ function [erasure_rate, failure_rate] = simulateLdpcRandom(Lambda, Rho, epsilon,
     n_failures_EC = 0;
     [H, G] = createLdpcFromPoly(Lambda, Rho);
     [k, n] = size(G);
-    for i = 1:sim_iterations
+    parfor i = 1:sim_iterations
         % Create codeword
         % codeword = randi([0, 1], [1, n]);
         codeword =  zeros(1, n);
