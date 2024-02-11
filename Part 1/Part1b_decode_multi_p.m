@@ -4,7 +4,7 @@ save_pie_plot = false ;
 
 
 k = 2 ;
-n = 8 ; 
+n = 4 ; 
 [G,~,dmin] = createGeneratorMatrix(n,k);
 
 
@@ -14,11 +14,14 @@ binary_vectors_k = dec2bin(0:2^k-1, k) - '0';
 all_codewords = mod(binary_vectors_k*G,2) ;
 
 
-% p = rand(1,n) / 3 ;  %
-p = repmat(0.1,1,n) 
+p = rand(1,n) / 3 ;  %
+% p = repmat(0.1,1,n) 
 % p = repmat(0.5,1,n) 
 
-disp(p)
+fprintf("p =")
+fprintf("   %f" , p )
+fprintf("\n")
+
 
 decode_table = decode_table_multi_p(G, p);
 
@@ -32,6 +35,19 @@ for c  = decode_table
     B(c{1}) = B(c{1}) + 1/ length(c{1}) ;     
 end
 
+
+% Create a table for the code
+T1 = table(dec2bin(0:2^k-1, k), repmat('=>',2^k,1) ,  num2str(all_codewords, '%d'), 'VariableNames', {'words',' ', 'codewords'});
+disp(T1)
+
+% Create a table for the decode
+if all(cellfun(@(x) numel(x) == 1, decode_table))
+    TT2_1 = all_codewords(cell2mat(decode_table),:);
+    TT2_2 = binary_vectors_k( cell2mat(decode_table) , : ) ; 
+    T2 = table(dec2bin(0:2^n-1, n), repmat('=>',2^n,1) ,  num2str(TT2_1, '%d'), repmat('=>',2^n,1) ,  num2str(TT2_2, '%d'), ...
+        'VariableNames', {'codeword received',' ', 'codeword estimated','  ', 'word'});
+    disp(T2)
+end
 
 
 
