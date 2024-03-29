@@ -96,9 +96,10 @@ end
 if save_BER_plots
     for figure_id = [f1 f2 f3 f4]
         file_name = strrep( figure_id.Name, ' ', '_') ; 
+        file_name = strrep( file_name, '/', '') ; 
         save_plots(main_folder, "BER_plots", file_name , save_formats , figure_id );
     end
 
 end
 
-clear f1 f2 f3 figure_id
+clear f1 f2 f3 f4 figure_id

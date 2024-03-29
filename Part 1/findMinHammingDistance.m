@@ -37,5 +37,5 @@ function d_min = findMinHammingDistance(A)
     distances = pdist(A, 'hamming');
     
     % Find the minimum Hamming distance
-    d_min = min(distances) * size(A, 2);
+    d_min = round(min(distances) * size(A, 2));
 end

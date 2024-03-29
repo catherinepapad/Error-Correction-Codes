@@ -7,42 +7,43 @@ clear;
 close all ;     
 
 %% Simulation parameters 
-n_array = 3:4;                      % [array] Codeword length
-k = 2;                              % Message length
-SNR_db_array = 20 ;                 % [array] SNR in db
-bits_per_symbol_array = 4 ;       % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
-D_number_of_bits_to_send_OG = 10^7 ;   % Number of symbols to send
-Ts = 2*10^-6 ;                      % Symbol duration in seconds
+n_array = 8:2:23;                       % [array] Codeword length
+k = 7;                                  % Message length
+SNR_db_array = 5:20 ;                   % [array] SNR in db
+bits_per_symbol_array = 1:8 ;           % [array] Order of modulation (e.g., bits_per_symbol=4 thus M=16 for 16-QAM)
+D_number_of_bits_to_send_OG = 10^7 ;    % Number of symbols to send
+Ts = 2*10^-6 ;                          % Symbol duration in seconds
 
 gray_encoding = true;
 useUnitAveragePower = true; % Set to false if you don't want unit average power
 
 %% Plot parameters 
 plot_all = false ; 
-plots_noisy_symbols     = plot_all || true ;    
+plots_noisy_symbols     = plot_all || false ;    
 plot_constalletions     = plot_all || false ; 
-plots_symbol_hist       = plot_all || true ;
-plot_final_results      = plot_all || false ; 
+plots_symbol_hist       = plot_all || false ;
+plot_final_results      = plot_all || true ; 
 
 %% Print parameters 
 print_all = false;
 print_code_info         = print_all || false ; 
 print_rates             = print_all || false ;
 print_BER               = print_all || false ; 
-print_current_status    = print_all || false ; 
+print_current_status    = print_all || true ; 
 
 %% Save plots parameters 
 save_all = true;
-save_surf_plots     = save_all || true ;
-save_BER_plots      = save_all || true ; 
-save_workspace      = save_all || true ; 
-save_noisy_symbols  = save_all || true ;
-save_histograms     = save_all || true ; 
+save_all_gard = true;
+save_surf_plots     = (save_all || true) && save_all_gard ;
+save_BER_plots      = (save_all || true) && save_all_gard ; 
+save_workspace      = (save_all || true) && save_all_gard ;
+save_noisy_symbols  = (save_all || true) && save_all_gard ;
+save_histograms     = (save_all || true) && save_all_gard ;
 
 
 %% Saves path and plots formats
 save_formats = [ "fig" "svg" ] ; % ie. "fig" "svg" "eps" etc.
-base_folder = "Runs\\Part1a";   % Specify the base folder and auto create one run
+base_folder = "Runs\Part1a";   % Specify the base folder and auto create one run
 
 
 
@@ -186,7 +187,7 @@ for n_index = 1:length(n_array)
         
                 
         %% Iterate over the differend SNR values
-        for SNR_index = SNR_indices
+        parfor SNR_index = SNR_indices
             SNR_db = SNR_db_array(SNR_index); 
 
             if print_current_status 
@@ -290,6 +291,7 @@ toc
 
 %% Call other scripts that make plots
 if plot_final_results
+    % Note that for large ranges of bits per symbols the plots would need resizing 
     plot_Part1a_resutls;
     if length(bits_per_symbol_array) > 1 &&  length(n_array) > 1
         plot_Part1a_surfs;

@@ -129,7 +129,7 @@ function P = generatePMatrix(n, k, options)
         all_codewords = mod(binary_vectors*G,2) ;
 
         % Calculate the minimum Hamming distance of the generated code
-        current_dmin = findMinHammingDistance(all_codewords) ; 
+        current_dmin = findMinHammingDistance(all_codewords) ;
     
         % Update the best solution if the current one is better
         if current_dmin > best_dmin

@@ -1,11 +1,11 @@
 function save_plots(main_folder, extra_folders, file_name , save_formats , figure_id )
 
     arguments
-        main_folder
-        extra_folders
-        file_name
-        save_formats
-        figure_id    = gcf()
+        main_folder         (1,1)   string 
+        extra_folders       (1,1)   string 
+        file_name           (1,1)   string 
+        save_formats        (1,:)   string 
+        figure_id           (1,1)   matlab.ui.Figure = gcf()
     end
 
 
