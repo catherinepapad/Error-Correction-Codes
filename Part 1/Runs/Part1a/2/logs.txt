@@ -1,3 +1,0 @@
-Single-error patterns loaded in decoding table.  2 rows remaining.
-2-error patterns loaded.  0 rows remaining.
-Elapsed time is 20.727407 seconds.
