@@ -1,9 +1,9 @@
 
 % Create irregular LDPC code
-r_avg_list = [3.5 4 6 8];
-l_max = 10;
+r_avg_list = [8 9 10 11 12];
+l_max = 15;
 epsilon = 0.4;
-n = 200;
+n = 1500;
 
 for r_avg = r_avg_list
 
@@ -22,7 +22,7 @@ for r_avg = r_avg_list
     [Reg_Lambdas, Reg_Rhos] = createRegularLdpc(n, desired_code_rate, rmax, lmax);
 
     % Simulate the performance of the irregular and regular LDPC codes
-    LDPC_iterations = 200;
+    LDPC_iterations = 1;
     sim_iterations = 100;
 
 
@@ -124,62 +124,3 @@ for i = 1:length(figs)
 end
 
 
-
-function poly_string = polyToString(poly)
-    % Create a string for the polynomial in the form 1 + x^a + x^b + ...
-    poly_string = sprintf('%dx^{%d}', poly(find(poly, 1)), find(poly, 1));
-    for i = find(poly, 1)+1:length(poly)
-        if poly(i) == 0
-            continue
-        end
-        poly_string = strcat(poly_string, sprintf(' + %dx^{%d}', poly(i), i));
-    end
-end
-
-
-
-function [erasure_rate, failure_rate] = simulateLdpcRandom(Lambda, Rho, epsilon, sim_iterations)
-    % Simulates a single LDPC code with given parameters
-    % Returns the bit erasure rate and the word failure rate (% of words 
-    % received with at least one erasure)
-    n_erasures = 0;
-    n_failures = 0;
-    n_erasures_EC = 0;
-    n_failures_EC = 0;
-    [H, G] = createLdpcFromPoly(Lambda, Rho);
-    [k, n] = size(G);
-    parfor i = 1:sim_iterations
-        % Create codeword
-        % codeword = randi([0, 1], [1, n]);
-        codeword =  zeros(1, n);
-
-        % Simulate binary erasure channel with erasure probability epsilon
-        received = codeword;
-        received(rand(size(received)) < epsilon) = NaN;
-
-        % Count received erasures
-        received_erasures = sum(isnan(received));
-        if received_erasures > 0
-            n_erasures = n_erasures + received_erasures;
-            n_failures = n_failures + 1;
-        end
-
-        % Decode received message
-        decoded = decodeLDPC(H, received, false);
-
-        % If no erasures, the codeword can be decoded (calculate syndrome etc.)
-        % (matlab 'decode' function can do this)
-        % If there are erasures, the codeword cannot be decoded
-
-        % Count erasures after error correction
-        decoded_erasures = sum(isnan(decoded));
-        if decoded_erasures > 0
-            n_erasures_EC = n_erasures_EC + decoded_erasures;
-            n_failures_EC = n_failures_EC + 1;
-        end
-    end
-    
-    erasure_rate = n_erasures_EC / (sim_iterations * n);
-    failure_rate = n_failures_EC / sim_iterations;
-
-end
