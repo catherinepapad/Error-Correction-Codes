@@ -33,15 +33,15 @@ function [H, G] = createLdpcFromPoly(lambda_poly, rho_poly)
     %
 
     % Validate arguments
-    arguments (Input)
-        lambda_poly (:, 1) double {mustBeInteger, mustBeNonnegative}
-        rho_poly    (:, 1) double {mustBeInteger, mustBeNonnegative}
-    end
-    % Output validation
-    arguments (Output)
-        H            (:,:) double {mustBeMember(H, [0, 1])} 
-        G            (:,:) double {mustBeMember(G, [0, 1])} 
-    end
+%     arguments (Input)
+%         lambda_poly (:, 1) double {mustBeInteger, mustBeNonnegative}
+%         rho_poly    (:, 1) double {mustBeInteger, mustBeNonnegative}
+%     end
+%     % Output validation
+%     arguments (Output)
+%         H            (:,:) double {mustBeMember(H, [0, 1])} 
+%         G            (:,:) double {mustBeMember(G, [0, 1])} 
+%     end
 
     % The amount of edges described by the polynomials must be equal
     n_lambda = sum(lambda_poly .* (1:length(lambda_poly)).' );
