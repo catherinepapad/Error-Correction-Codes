@@ -1,7 +1,7 @@
 
 % Create irregular LDPC code
-r_avg_list = [8 9];
-%r_avg_list = [8 9 10 11 12];
+
+r_avg_list = [8 9 10 11 12];
 l_max = 15;
 epsilon = 0.4;
 n = 1500;

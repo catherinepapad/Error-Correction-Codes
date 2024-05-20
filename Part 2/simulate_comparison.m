@@ -3,11 +3,7 @@
 r_avg_list = [5 6 7 8 9 10 11 12 13 14];
 %r_avg_list = [5];
 l_max = 15;
-<<<<<<< HEAD
 epsilon = 0.1;
-=======
-epsilon = 0.5;
->>>>>>> 2ab4d3e6549d8b52b031c7bd2edde251bda56db0
 n = 1500;
 
 LDPC_idx = [];
