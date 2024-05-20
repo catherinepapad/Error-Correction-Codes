@@ -1,8 +1,9 @@
 
 % Create irregular LDPC code
 r_avg_list = [5 6 7 8 9 10 11 12 13 14];
+%r_avg_list = [5];
 l_max = 15;
-epsilon = 0.3;
+epsilon = 0.1;
 n = 1500;
 
 LDPC_idx = [];
@@ -83,7 +84,7 @@ ylabel('Erasure Rate');
 ylim([0, inf]);
 xticks(LDPC_idx);
 xticklabels(LDPC_type_list);
-legend(LDPC_str_list, 'Location', 'best');
+legend(LDPC_str_list, 'Location', 'best','FontSize',7);
 hold off;
 drawnow;
 
